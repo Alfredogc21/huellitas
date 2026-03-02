@@ -22,46 +22,46 @@ import androidx.compose.ui.unit.dp
 import com.example.huellitas.ui.theme.HuellitasTheme
 
 /**
- * Animated dot indicator for onboarding pages.
- * The active dot expands horizontally for visual emphasis.
+ * Indicador de página animado para las pantallas de bienvenida.
+ * El punto activo se expande horizontalmente para dar énfasis visual.
  *
- * @param totalPages Total number of onboarding pages
- * @param currentPage Zero-based index of the current page
- * @param activeColor Color for the active indicator dot
- * @param inactiveColor Color for inactive indicator dots
+ * @param totalPaginas Número total de páginas
+ * @param paginaActual Índice de la página actual (base 0)
+ * @param colorActivo Color del punto activo
+ * @param colorInactivo Color de los puntos inactivos
  */
 @Composable
-fun PageIndicator(
-    totalPages: Int,
-    currentPage: Int,
+fun IndicadorPagina(
+    totalPaginas: Int,
+    paginaActual: Int,
     modifier: Modifier = Modifier,
-    activeColor: Color = MaterialTheme.colorScheme.primary,
-    inactiveColor: Color = MaterialTheme.colorScheme.outlineVariant
+    colorActivo: Color = MaterialTheme.colorScheme.primary,
+    colorInactivo: Color = MaterialTheme.colorScheme.outlineVariant
 ) {
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        repeat(totalPages) { index ->
-            val isSelected = index == currentPage
+        repeat(totalPaginas) { indice ->
+            val estaSeleccionado = indice == paginaActual
 
-            val width by animateDpAsState(
-                targetValue = if (isSelected) 24.dp else 8.dp,
+            val ancho by animateDpAsState(
+                targetValue = if (estaSeleccionado) 28.dp else 8.dp,
                 animationSpec = tween(durationMillis = 300),
-                label = "indicator_width"
+                label = "ancho_indicador"
             )
 
             val color by animateColorAsState(
-                targetValue = if (isSelected) activeColor else inactiveColor,
+                targetValue = if (estaSeleccionado) colorActivo else colorInactivo,
                 animationSpec = tween(durationMillis = 300),
-                label = "indicator_color"
+                label = "color_indicador"
             )
 
             Box(
                 modifier = Modifier
                     .height(8.dp)
-                    .width(width)
+                    .width(ancho)
                     .clip(CircleShape)
                     .background(color)
             )
@@ -71,8 +71,8 @@ fun PageIndicator(
 
 @Preview(showBackground = true)
 @Composable
-private fun PageIndicatorPreview() {
+private fun IndicadorPaginaPreview() {
     HuellitasTheme {
-        PageIndicator(totalPages = 3, currentPage = 1)
+        IndicadorPagina(totalPaginas = 2, paginaActual = 0)
     }
 }

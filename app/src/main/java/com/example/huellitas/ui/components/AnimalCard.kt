@@ -1,12 +1,10 @@
 package com.example.huellitas.ui.components
 
 import android.text.format.DateFormat
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -28,27 +26,37 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.huellitas.model.Animal
-import com.example.huellitas.model.AnimalType
+import com.example.huellitas.model.TipoAnimal
 import com.example.huellitas.ui.theme.CatChip
 import com.example.huellitas.ui.theme.DogChip
 import com.example.huellitas.ui.theme.HuellitasTheme
 import java.util.Date
 
 /**
- * Beautiful card component for displaying animal information.
- * Features a placeholder image area, type badge, and organized info layout.
+ * Tarjeta de animal con imagen cargada mediante Coil,
+ * badge de tipo, y disposición organizada de la información.
  *
- * @param animal The animal data to display
- * @param modifier External layout modifier
+ * Características:
+ * - Carga asíncrona de imagen con placeholder
+ * - Badge de tipo (Perro/Gato) con color distintivo
+ * - Información organizada con íconos
+ *
+ * @param animal Datos del animal a mostrar
+ * @param modifier Modificador externo de layout
  */
 @Composable
-fun AnimalCard(
+fun TarjetaAnimal(
     animal: Animal,
     modifier: Modifier = Modifier
 ) {
@@ -61,27 +69,53 @@ fun AnimalCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column {
-            // ── Image Placeholder with Type Badge ──
+            // ── Imagen del animal con badge de tipo ──
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(180.dp)
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .height(200.dp)
+                    .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
             ) {
-                Icon(
-                    imageVector = Icons.Outlined.Pets,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(64.dp)
-                        .align(Alignment.Center),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
-                )
+                if (animal.imagenUrl != null) {
+                    // Carga de imagen desde URL con Coil
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(animal.imagenUrl)
+                            .crossfade(true)
+                            .build(),
+                        contentDescription = "Foto de ${animal.nombre}",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                } else {
+                    // Placeholder cuando no hay imagen
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(0.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Surface(
+                            modifier = Modifier.fillMaxSize(),
+                            color = MaterialTheme.colorScheme.surfaceVariant
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Pets,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(64.dp),
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
+                                )
+                            }
+                        }
+                    }
+                }
 
-                // Type badge (top-end corner)
-                val chipColor = when (animal.type) {
-                    AnimalType.DOG -> DogChip
-                    AnimalType.CAT -> CatChip
-                    AnimalType.OTHER -> MaterialTheme.colorScheme.tertiary
+                // Badge de tipo (esquina superior derecha)
+                val colorBadge = when (animal.tipo) {
+                    TipoAnimal.PERRO -> DogChip
+                    TipoAnimal.GATO -> CatChip
+                    TipoAnimal.OTRO -> MaterialTheme.colorScheme.tertiary
                 }
 
                 Surface(
@@ -89,10 +123,10 @@ fun AnimalCard(
                         .padding(12.dp)
                         .align(Alignment.TopEnd),
                     shape = RoundedCornerShape(20.dp),
-                    color = chipColor.copy(alpha = 0.9f)
+                    color = colorBadge.copy(alpha = 0.9f)
                 ) {
                     Text(
-                        text = animal.type.label,
+                        text = animal.tipo.etiqueta,
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.surface,
@@ -101,13 +135,13 @@ fun AnimalCard(
                 }
             }
 
-            // ── Content Section ──
+            // ── Sección de contenido ──
             Column(
                 modifier = Modifier.padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
-                    text = animal.name.ifEmpty { "Animal sin nombre" },
+                    text = animal.nombre.ifEmpty { "Animal sin nombre" },
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -115,9 +149,9 @@ fun AnimalCard(
                     overflow = TextOverflow.Ellipsis
                 )
 
-                if (animal.breed.isNotEmpty()) {
+                if (animal.raza.isNotEmpty()) {
                     Text(
-                        text = animal.breed,
+                        text = animal.raza,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -128,29 +162,29 @@ fun AnimalCard(
                 )
 
                 Text(
-                    text = animal.description,
+                    text = animal.descripcion,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
 
-                InfoRow(
-                    icon = Icons.Outlined.LocationOn,
-                    text = animal.location,
-                    contentDescription = "Ubicación"
+                FilaInfo(
+                    icono = Icons.Outlined.LocationOn,
+                    texto = animal.ubicacion,
+                    descripcionContenido = "Ubicación"
                 )
 
-                InfoRow(
-                    icon = Icons.Outlined.Phone,
-                    text = animal.contact,
-                    contentDescription = "Contacto"
+                FilaInfo(
+                    icono = Icons.Outlined.Phone,
+                    texto = animal.contacto,
+                    descripcionContenido = "Contacto"
                 )
 
-                InfoRow(
-                    icon = Icons.Outlined.CalendarToday,
-                    text = DateFormat.format("dd MMM yyyy", animal.registrationDate).toString(),
-                    contentDescription = "Fecha de registro"
+                FilaInfo(
+                    icono = Icons.Outlined.CalendarToday,
+                    texto = DateFormat.format("dd MMM yyyy", animal.fechaRegistro).toString(),
+                    descripcionContenido = "Fecha de registro"
                 )
             }
         }
@@ -158,26 +192,27 @@ fun AnimalCard(
 }
 
 /**
- * A single info row with an icon and text label.
+ * Fila de información con ícono y texto.
+ * Util para mostrar ubicación, contacto, fecha, etc.
  */
 @Composable
-private fun InfoRow(
-    icon: ImageVector,
-    text: String,
-    contentDescription: String
+private fun FilaInfo(
+    icono: ImageVector,
+    texto: String,
+    descripcionContenido: String
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Icon(
-            imageVector = icon,
-            contentDescription = contentDescription,
+            imageVector = icono,
+            contentDescription = descripcionContenido,
             modifier = Modifier.size(18.dp),
             tint = MaterialTheme.colorScheme.primary
         )
         Text(
-            text = text,
+            text = texto,
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             maxLines = 1,
@@ -188,18 +223,39 @@ private fun InfoRow(
 
 @Preview(showBackground = true)
 @Composable
-private fun AnimalCardPreview() {
+private fun TarjetaAnimalConImagenPreview() {
     HuellitasTheme {
-        AnimalCard(
+        TarjetaAnimal(
             animal = Animal(
                 id = "1",
-                name = "Max",
-                type = AnimalType.DOG,
-                breed = "Labrador",
-                description = "Muy juguetón, le encanta correr y jugar con niños.",
-                location = "Parque central",
-                contact = "max@example.com",
-                registrationDate = Date()
+                nombre = "Max",
+                tipo = TipoAnimal.PERRO,
+                raza = "Labrador",
+                descripcion = "Muy juguetón, le encanta correr y jugar con niños.",
+                ubicacion = "Parque central",
+                contacto = "max@ejemplo.com",
+                imagenUrl = "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&h=300&fit=crop",
+                fechaRegistro = Date()
+            ),
+            modifier = Modifier.padding(16.dp)
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun TarjetaAnimalSinImagenPreview() {
+    HuellitasTheme {
+        TarjetaAnimal(
+            animal = Animal(
+                id = "2",
+                nombre = "Luna",
+                tipo = TipoAnimal.GATO,
+                raza = "Siamés",
+                descripcion = "Tímida pero cariñosa.",
+                ubicacion = "Calle 10",
+                contacto = "luna@ejemplo.com",
+                fechaRegistro = Date()
             ),
             modifier = Modifier.padding(16.dp)
         )

@@ -5,19 +5,17 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.navigation.compose.rememberNavController
-import com.example.huellitas.navigation.HuellitasNavHost
+import com.example.huellitas.navigation.NavHostHuellitas
 import com.example.huellitas.ui.theme.HuellitasTheme
 
 /**
- * Single Activity entry point for Huellitas.
+ * Actividad principal y único punto de entrada de Huellitas.
  *
- * Uses edge-to-edge display and delegates all UI
- * to Jetpack Compose via [HuellitasNavHost].
+ * Utiliza pantalla edge-to-edge y delega toda la interfaz
+ * a Jetpack Compose mediante [NavHostHuellitas].
  */
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,33 +23,33 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             HuellitasTheme {
-                HuellitasMainContent()
+                ContenidoPrincipal()
             }
         }
     }
 }
 
 /**
- * Root composable that wires up navigation.
+ * Composable raíz que conecta la navegación.
  *
- * Manages onboarding completion state to determine the start
- * destination. On first launch the user sees the onboarding flow;
- * on subsequent launches they go straight to the animal list.
+ * Gestiona el estado de bienvenida completada para determinar
+ * el destino inicial. En el primer inicio se muestra la carga
+ * y bienvenida; después se va directo a la lista de animales.
  *
- * Note: In production, [isOnboardingCompleted] should be persisted
- * using Jetpack DataStore or SharedPreferences so it survives
- * process death and app reinstalls.
+ * Nota: En producción, `bienvenidaCompletada` debería persistirse
+ * usando Jetpack DataStore o SharedPreferences para sobrevivir
+ * al cierre de la app y reinstalaciones.
  */
 @Composable
-private fun HuellitasMainContent() {
-    val navController = rememberNavController()
+private fun ContenidoPrincipal() {
+    val controladorNav = rememberNavController()
 
-    // TODO: Replace with DataStore for real persistence across sessions
-    var isOnboardingCompleted by rememberSaveable { mutableStateOf(false) }
+    // TODO: Reemplazar con DataStore para persistencia real entre sesiones
+    val estadoBienvenida = rememberSaveable { mutableStateOf(false) }
 
-    HuellitasNavHost(
-        navController = navController,
-        isOnboardingCompleted = isOnboardingCompleted,
-        onOnboardingComplete = { isOnboardingCompleted = true }
+    NavHostHuellitas(
+        controladorNav = controladorNav,
+        bienvenidaCompletada = estadoBienvenida.value,
+        alCompletarBienvenida = { estadoBienvenida.value = true }
     )
 }

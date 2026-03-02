@@ -1,14 +1,14 @@
 package com.example.huellitas.model
 
 /**
- * Defines how the animal list can be sorted/filtered.
+ * Opciones de filtrado y ordenamiento para la lista de animales.
  *
- * - [RECENT]: Shows only animals from the last 7 days, newest first
- * - [BY_DATE]: Shows all animals sorted by date, newest first
- * - [OLDEST]: Shows all animals sorted by date, oldest first
+ * - [RECIENTES]: Ordena de más reciente a más antiguo
+ * - [POR_FECHA]: Permite seleccionar una fecha específica en el calendario
+ * - [ANTIGUOS]: Ordena de más antiguo a más reciente
  */
-enum class SortOption(val label: String) {
-    RECENT("Recientes"),
-    BY_DATE("Por fecha"),
-    OLDEST("Más antiguos")
+enum class OpcionFiltro(val etiqueta: String) {
+    RECIENTES("Recientes"),
+    POR_FECHA("Por fecha"),
+    ANTIGUOS("Más antiguos")
 }

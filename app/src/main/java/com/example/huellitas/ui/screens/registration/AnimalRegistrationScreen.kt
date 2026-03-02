@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Category
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Done
@@ -27,6 +28,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -46,95 +48,96 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.huellitas.model.AnimalType
-import com.example.huellitas.ui.components.PageIndicator
+import com.example.huellitas.model.TipoAnimal
 import com.example.huellitas.ui.theme.HuellitasTheme
 
 /**
- * Form screen for registering a new stray animal.
- * Organized into clear sections: photo, type, info, and location/contact.
+ * Pantalla de formulario para registrar un nuevo animal callejero.
+ * Organizada en secciones claras: foto, tipo, información y ubicación/contacto.
  *
- * Used in both the onboarding flow (with page indicator) and the main app.
- *
- * @param onRegistrationComplete Callback when the form is submitted
- * @param isOnboarding Whether this is shown during onboarding (shows page indicator)
+ * @param alCompletarRegistro Callback cuando se envía el formulario
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AnimalRegistrationScreen(
-    onRegistrationComplete: () -> Unit,
-    isOnboarding: Boolean = false
+fun PantallaRegistroAnimal(
+    alCompletarRegistro: () -> Unit
 ) {
-    // ── Form State ──
-    var animalName by rememberSaveable { mutableStateOf("") }
-    var selectedType by rememberSaveable { mutableStateOf(AnimalType.DOG) }
-    var breed by rememberSaveable { mutableStateOf("") }
-    var description by rememberSaveable { mutableStateOf("") }
-    var location by rememberSaveable { mutableStateOf("") }
-    var contact by rememberSaveable { mutableStateOf("") }
+    // ── Estado del formulario ──
+    var nombreAnimal by rememberSaveable { mutableStateOf("") }
+    var tipoSeleccionado by rememberSaveable { mutableStateOf(TipoAnimal.PERRO) }
+    var raza by rememberSaveable { mutableStateOf("") }
+    var descripcion by rememberSaveable { mutableStateOf("") }
+    var ubicacion by rememberSaveable { mutableStateOf("") }
+    var contacto by rememberSaveable { mutableStateOf("") }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        text = if (isOnboarding) "Registra tu primer animal" else "Registrar animal",
+                        text = "Registrar animal",
                         fontWeight = FontWeight.SemiBold
                     )
+                },
+                navigationIcon = {
+                    IconButton(onClick = alCompletarRegistro) {
+                        Icon(
+                            imageVector = Icons.Outlined.ArrowBack,
+                            contentDescription = "Volver"
+                        )
+                    }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surface
                 )
             )
         }
-    ) { innerPadding ->
+    ) { paddingInterno ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
+                .padding(paddingInterno)
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (isOnboarding) {
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "¡Comparte la información de un animal para que reciba ayuda!",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-            } else {
-                Spacer(modifier = Modifier.height(8.dp))
-            }
+            Spacer(modifier = Modifier.height(8.dp))
 
-            // ── Photo Upload Area ──
-            PhotoUploadPlaceholder()
+            Text(
+                text = "¡Comparte la información del animal para que reciba ayuda!",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // ── Zona de subida de foto ──
+            PlaceholderSubirFoto()
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // ── Animal Type Selection ──
-            SectionHeader(text = "Tipo de animal")
+            // ── Selección de tipo de animal ──
+            EncabezadoSeccion(texto = "Tipo de animal")
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            AnimalTypeSelector(
-                selectedType = selectedType,
-                onTypeSelected = { selectedType = it }
+            SelectorTipoAnimal(
+                tipoSeleccionado = tipoSeleccionado,
+                alSeleccionarTipo = { tipoSeleccionado = it }
             )
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // ── Animal Information ──
-            SectionHeader(text = "Información del animal")
+            // ── Información del animal ──
+            EncabezadoSeccion(texto = "Información del animal")
 
             Spacer(modifier = Modifier.height(12.dp))
 
             OutlinedTextField(
-                value = animalName,
-                onValueChange = { animalName = it },
+                value = nombreAnimal,
+                onValueChange = { nombreAnimal = it },
                 label = { Text("Nombre (opcional)") },
                 leadingIcon = { Icon(Icons.Outlined.Pets, contentDescription = null) },
                 modifier = Modifier.fillMaxWidth(),
@@ -145,8 +148,8 @@ fun AnimalRegistrationScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
             OutlinedTextField(
-                value = breed,
-                onValueChange = { breed = it },
+                value = raza,
+                onValueChange = { raza = it },
                 label = { Text("Raza (opcional)") },
                 leadingIcon = { Icon(Icons.Outlined.Category, contentDescription = null) },
                 modifier = Modifier.fillMaxWidth(),
@@ -157,8 +160,8 @@ fun AnimalRegistrationScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
             OutlinedTextField(
-                value = description,
-                onValueChange = { description = it },
+                value = descripcion,
+                onValueChange = { descripcion = it },
                 label = { Text("Descripción (comportamiento, salud)") },
                 leadingIcon = { Icon(Icons.Outlined.Description, contentDescription = null) },
                 modifier = Modifier.fillMaxWidth(),
@@ -169,14 +172,14 @@ fun AnimalRegistrationScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // ── Location & Contact ──
-            SectionHeader(text = "Ubicación y contacto")
+            // ── Ubicación y contacto ──
+            EncabezadoSeccion(texto = "Ubicación y contacto")
 
             Spacer(modifier = Modifier.height(12.dp))
 
             OutlinedTextField(
-                value = location,
-                onValueChange = { location = it },
+                value = ubicacion,
+                onValueChange = { ubicacion = it },
                 label = { Text("Ubicación del animal") },
                 leadingIcon = { Icon(Icons.Outlined.LocationOn, contentDescription = null) },
                 modifier = Modifier.fillMaxWidth(),
@@ -187,8 +190,8 @@ fun AnimalRegistrationScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
             OutlinedTextField(
-                value = contact,
-                onValueChange = { contact = it },
+                value = contacto,
+                onValueChange = { contacto = it },
                 label = { Text("Teléfono o email de contacto") },
                 leadingIcon = { Icon(Icons.Outlined.Phone, contentDescription = null) },
                 modifier = Modifier.fillMaxWidth(),
@@ -198,9 +201,9 @@ fun AnimalRegistrationScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // ── Submit Button ──
+            // ── Botón de enviar ──
             Button(
-                onClick = onRegistrationComplete,
+                onClick = alCompletarRegistro,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
@@ -219,23 +222,18 @@ fun AnimalRegistrationScreen(
                 )
             }
 
-            if (isOnboarding) {
-                Spacer(modifier = Modifier.height(24.dp))
-                PageIndicator(totalPages = 3, currentPage = 2)
-            }
-
             Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }
 
 /**
- * Reusable section header for form grouping.
+ * Encabezado reutilizable para las secciones del formulario.
  */
 @Composable
-private fun SectionHeader(text: String) {
+private fun EncabezadoSeccion(texto: String) {
     Text(
-        text = text,
+        text = texto,
         style = MaterialTheme.typography.titleSmall,
         fontWeight = FontWeight.SemiBold,
         color = MaterialTheme.colorScheme.onSurface,
@@ -244,10 +242,11 @@ private fun SectionHeader(text: String) {
 }
 
 /**
- * Styled placeholder for photo upload with outlined border.
+ * Placeholder estilizado para la zona de subida de foto.
+ * Muestra un borde punteado con ícono de cámara.
  */
 @Composable
-private fun PhotoUploadPlaceholder() {
+private fun PlaceholderSubirFoto() {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -284,27 +283,28 @@ private fun PhotoUploadPlaceholder() {
 }
 
 /**
- * Chip-based selector for choosing the animal type.
+ * Selector basado en chips para elegir el tipo de animal.
+ * Muestra opciones de Perro, Gato u Otro.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun AnimalTypeSelector(
-    selectedType: AnimalType,
-    onTypeSelected: (AnimalType) -> Unit
+private fun SelectorTipoAnimal(
+    tipoSeleccionado: TipoAnimal,
+    alSeleccionarTipo: (TipoAnimal) -> Unit
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        AnimalType.entries.forEach { type ->
-            val isSelected = type == selectedType
+        TipoAnimal.entries.forEach { tipo ->
+            val estaSeleccionado = tipo == tipoSeleccionado
             FilterChip(
-                selected = isSelected,
-                onClick = { onTypeSelected(type) },
+                selected = estaSeleccionado,
+                onClick = { alSeleccionarTipo(tipo) },
                 label = {
                     Text(
-                        text = type.label,
-                        fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal
+                        text = tipo.etiqueta,
+                        fontWeight = if (estaSeleccionado) FontWeight.SemiBold else FontWeight.Normal
                     )
                 },
                 modifier = Modifier.weight(1f),
@@ -319,22 +319,8 @@ private fun AnimalTypeSelector(
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-private fun RegistrationOnboardingPreview() {
+private fun PantallaRegistroPreview() {
     HuellitasTheme {
-        AnimalRegistrationScreen(
-            onRegistrationComplete = {},
-            isOnboarding = true
-        )
-    }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-private fun RegistrationMainPreview() {
-    HuellitasTheme {
-        AnimalRegistrationScreen(
-            onRegistrationComplete = {},
-            isOnboarding = false
-        )
+        PantallaRegistroAnimal(alCompletarRegistro = {})
     }
 }

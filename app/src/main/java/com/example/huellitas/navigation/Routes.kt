@@ -1,17 +1,19 @@
 package com.example.huellitas.navigation
 
 /**
- * Single source of truth for all navigation routes in the app.
- * Organized by flow for clarity and maintainability.
+ * Fuente única de verdad para todas las rutas de navegación.
+ * Organizadas por flujo para mayor claridad y mantenibilidad.
  */
-object Routes {
+object Rutas {
 
-    // ── Onboarding Flow (shown only on first launch) ──
-    const val WELCOME = "onboarding/welcome"
-    const val INTRODUCTION = "onboarding/introduction"
-    const val REGISTRATION = "onboarding/registration"
+    // ── Pantalla de carga (Lottie preloader) ──
+    const val CARGA = "carga"
 
-    // ── Main App ──
-    const val HOME = "home"
-    const val ADD_ANIMAL = "add_animal"
+    // ── Flujo de bienvenida (solo en primer inicio) ──
+    const val BIENVENIDA = "bienvenida"
+    const val INTRODUCCION = "introduccion"
+
+    // ── Aplicación principal ──
+    const val INICIO = "inicio"
+    const val REGISTRAR_ANIMAL = "registrar_animal"
 }

@@ -3,36 +3,36 @@ package com.example.huellitas.model
 import java.util.Date
 
 /**
- * Represents a stray animal registered in the app.
- * This is the core data model for animal listings.
+ * Representa un animal callejero registrado en la aplicación.
+ * Modelo de datos principal para los listados de animales.
  *
- * @param id Unique identifier for the animal
- * @param name Display name (may be empty if unknown)
- * @param type The species/type of animal
- * @param breed The breed of the animal (may be empty)
- * @param description Behavioral and health notes
- * @param location Where the animal was last seen
- * @param contact How to reach the person who registered it
- * @param imageUrl Optional photo URL
- * @param registrationDate When the animal was registered
+ * @param id Identificador único del animal
+ * @param nombre Nombre visible (puede estar vacío si es desconocido)
+ * @param tipo Especie/tipo de animal
+ * @param raza Raza del animal (puede estar vacía)
+ * @param descripcion Notas de comportamiento y salud
+ * @param ubicacion Dónde fue visto por última vez
+ * @param contacto Cómo contactar a quien lo registró
+ * @param imagenUrl URL opcional de la foto del animal
+ * @param fechaRegistro Fecha en que fue registrado
  */
 data class Animal(
     val id: String,
-    val name: String,
-    val type: AnimalType,
-    val breed: String,
-    val description: String,
-    val location: String,
-    val contact: String,
-    val imageUrl: String? = null,
-    val registrationDate: Date = Date()
+    val nombre: String,
+    val tipo: TipoAnimal,
+    val raza: String,
+    val descripcion: String,
+    val ubicacion: String,
+    val contacto: String,
+    val imagenUrl: String? = null,
+    val fechaRegistro: Date = Date()
 )
 
 /**
- * Types of animals supported by the app.
+ * Tipos de animales soportados por la aplicación.
  */
-enum class AnimalType(val label: String) {
-    DOG("Perro"),
-    CAT("Gato"),
-    OTHER("Otro")
+enum class TipoAnimal(val etiqueta: String) {
+    PERRO("Perro"),
+    GATO("Gato"),
+    OTRO("Otro")
 }

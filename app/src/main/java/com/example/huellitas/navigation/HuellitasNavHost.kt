@@ -1,106 +1,120 @@
 package com.example.huellitas.navigation
 
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.huellitas.ui.screens.home.AnimalListScreen
-import com.example.huellitas.ui.screens.onboarding.IntroductionScreen
-import com.example.huellitas.ui.screens.onboarding.WelcomeScreen
-import com.example.huellitas.ui.screens.registration.AnimalRegistrationScreen
+import com.example.huellitas.ui.screens.home.PantallaListaAnimales
+import com.example.huellitas.ui.screens.onboarding.PantallaBienvenida
+import com.example.huellitas.ui.screens.onboarding.PantallaIntroduccion
+import com.example.huellitas.ui.screens.registration.PantallaRegistroAnimal
+import com.example.huellitas.ui.screens.splash.PantallaCarga
 
-private const val ANIMATION_DURATION = 400
+private const val DURACION_ANIMACION = 400
 
 /**
- * Main navigation host for Huellitas.
+ * Host de navegación principal de Huellitas.
  *
- * Manages two flows:
- * 1. **Onboarding**: Welcome → Introduction → Registration (first launch only)
- * 2. **Main App**: Animal list with option to add new animals
+ * Gestiona los flujos:
+ * 1. **Carga**: Animación Lottie de precarga
+ * 2. **Bienvenida**: Pantalla de bienvenida → Introducción → [Ver animales | Registrar]
+ * 3. **App principal**: Lista de animales con opción de agregar nuevos
  *
- * @param navController The navigation controller managing back stack
- * @param isOnboardingCompleted Whether the user has completed onboarding
- * @param onOnboardingComplete Callback to mark onboarding as done
+ * @param controladorNav Controlador de navegación que gestiona el back stack
+ * @param bienvenidaCompletada Si el usuario ya completó la bienvenida
+ * @param alCompletarBienvenida Callback para marcar la bienvenida como completada
  */
 @Composable
-fun HuellitasNavHost(
-    navController: NavHostController,
-    isOnboardingCompleted: Boolean,
-    onOnboardingComplete: () -> Unit
+fun NavHostHuellitas(
+    controladorNav: NavHostController,
+    bienvenidaCompletada: Boolean,
+    alCompletarBienvenida: () -> Unit
 ) {
-    val startDestination = if (isOnboardingCompleted) Routes.HOME else Routes.WELCOME
+    val destinoInicial = if (bienvenidaCompletada) Rutas.INICIO else Rutas.CARGA
 
     NavHost(
-        navController = navController,
-        startDestination = startDestination,
+        navController = controladorNav,
+        startDestination = destinoInicial,
         enterTransition = {
             slideInHorizontally(
-                initialOffsetX = { fullWidth -> fullWidth },
-                animationSpec = tween(ANIMATION_DURATION)
-            ) + fadeIn(animationSpec = tween(ANIMATION_DURATION))
+                initialOffsetX = { ancho -> ancho },
+                animationSpec = tween(DURACION_ANIMACION)
+            ) + fadeIn(animationSpec = tween(DURACION_ANIMACION))
         },
         exitTransition = {
             slideOutHorizontally(
-                targetOffsetX = { fullWidth -> -fullWidth },
-                animationSpec = tween(ANIMATION_DURATION)
-            ) + fadeOut(animationSpec = tween(ANIMATION_DURATION))
+                targetOffsetX = { ancho -> -ancho },
+                animationSpec = tween(DURACION_ANIMACION)
+            ) + fadeOut(animationSpec = tween(DURACION_ANIMACION))
         },
         popEnterTransition = {
             slideInHorizontally(
-                initialOffsetX = { fullWidth -> -fullWidth },
-                animationSpec = tween(ANIMATION_DURATION)
-            ) + fadeIn(animationSpec = tween(ANIMATION_DURATION))
+                initialOffsetX = { ancho -> -ancho },
+                animationSpec = tween(DURACION_ANIMACION)
+            ) + fadeIn(animationSpec = tween(DURACION_ANIMACION))
         },
         popExitTransition = {
             slideOutHorizontally(
-                targetOffsetX = { fullWidth -> fullWidth },
-                animationSpec = tween(ANIMATION_DURATION)
-            ) + fadeOut(animationSpec = tween(ANIMATION_DURATION))
+                targetOffsetX = { ancho -> ancho },
+                animationSpec = tween(DURACION_ANIMACION)
+            ) + fadeOut(animationSpec = tween(DURACION_ANIMACION))
         }
     ) {
-        // ── Onboarding ──────────────────────────────────────────────
+        // ── Pantalla de carga (Lottie) ──────────────────────────────
 
-        composable(Routes.WELCOME) {
-            WelcomeScreen(
-                onNext = { navController.navigate(Routes.INTRODUCTION) }
+        composable(Rutas.CARGA) {
+            PantallaCarga(
+                alTerminarCarga = {
+                    controladorNav.navigate(Rutas.BIENVENIDA) {
+                        popUpTo(Rutas.CARGA) { inclusive = true }
+                    }
+                }
             )
         }
 
-        composable(Routes.INTRODUCTION) {
-            IntroductionScreen(
-                onNext = { navController.navigate(Routes.REGISTRATION) }
+        // ── Bienvenida ──────────────────────────────────────────────
+
+        composable(Rutas.BIENVENIDA) {
+            PantallaBienvenida(
+                alSiguiente = { controladorNav.navigate(Rutas.INTRODUCCION) }
             )
         }
 
-        composable(Routes.REGISTRATION) {
-            AnimalRegistrationScreen(
-                onRegistrationComplete = {
-                    onOnboardingComplete()
-                    navController.navigate(Routes.HOME) {
-                        popUpTo(Routes.WELCOME) { inclusive = true }
+        composable(Rutas.INTRODUCCION) {
+            PantallaIntroduccion(
+                alVerAnimales = {
+                    alCompletarBienvenida()
+                    controladorNav.navigate(Rutas.INICIO) {
+                        popUpTo(Rutas.CARGA) { inclusive = true }
                     }
                 },
-                isOnboarding = true
+                alRegistrarAnimal = {
+                    alCompletarBienvenida()
+                    // Navegamos a INICIO primero para tener back stack correcto
+                    controladorNav.navigate(Rutas.INICIO) {
+                        popUpTo(Rutas.CARGA) { inclusive = true }
+                    }
+                    controladorNav.navigate(Rutas.REGISTRAR_ANIMAL)
+                }
             )
         }
 
-        // ── Main App ────────────────────────────────────────────────
+        // ── Aplicación principal ────────────────────────────────────
 
-        composable(Routes.HOME) {
-            AnimalListScreen(
-                onNavigateToRegister = { navController.navigate(Routes.ADD_ANIMAL) }
+        composable(Rutas.INICIO) {
+            PantallaListaAnimales(
+                alNavegarARegistro = { controladorNav.navigate(Rutas.REGISTRAR_ANIMAL) }
             )
         }
 
-        composable(Routes.ADD_ANIMAL) {
-            AnimalRegistrationScreen(
-                onRegistrationComplete = { navController.popBackStack() },
-                isOnboarding = false
+        composable(Rutas.REGISTRAR_ANIMAL) {
+            PantallaRegistroAnimal(
+                alCompletarRegistro = { controladorNav.popBackStack() }
             )
         }
     }

@@ -60,12 +60,16 @@ class AnimalRegistroViewModel(
         ubicacion: String,
         contacto: String
     ) {
-        if (ubicacion.isBlank()) {
-            _estadoRegistro.value = EstadoRegistro.Error("La ubicación es obligatoria.")
+        if (_imagenUri.value == null) {
+            _estadoRegistro.value = EstadoRegistro.Error("La foto es obligatoria.")
             return
         }
-        if (contacto.isBlank()) {
-            _estadoRegistro.value = EstadoRegistro.Error("El contacto es obligatorio.")
+        if (descripcion.isBlank()) {
+            _estadoRegistro.value = EstadoRegistro.Error("La descripción es obligatoria.")
+            return
+        }
+        if (ubicacion.isBlank()) {
+            _estadoRegistro.value = EstadoRegistro.Error("La ubicación es obligatoria.")
             return
         }
 

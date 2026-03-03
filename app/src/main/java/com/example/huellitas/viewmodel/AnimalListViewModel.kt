@@ -30,12 +30,16 @@ class AnimalListViewModel(
     private val _estado = MutableStateFlow<EstadoListaAnimales>(EstadoListaAnimales.Cargando)
     val estado: StateFlow<EstadoListaAnimales> = _estado.asStateFlow()
 
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
+
     init {
         cargarAnimales()
     }
 
     /**
      * Carga todos los animales desde el servidor.
+     * Muestra el estado Cargando (pantalla completa con spinner).
      */
     fun cargarAnimales() {
         viewModelScope.launch {
@@ -44,6 +48,21 @@ class AnimalListViewModel(
                 is Resultado.Exito -> EstadoListaAnimales.Exito(resultado.datos)
                 is Resultado.Error -> EstadoListaAnimales.Error(resultado.mensaje)
             }
+        }
+    }
+
+    /**
+     * Recarga la lista sin ocultar el contenido actual (para pull-to-refresh).
+     * Activa el indicador de refresco sin cambiar al estado Cargando.
+     */
+    fun refrescar() {
+        viewModelScope.launch {
+            _isRefreshing.value = true
+            when (val resultado = repository.obtenerAnimales()) {
+                is Resultado.Exito -> _estado.value = EstadoListaAnimales.Exito(resultado.datos)
+                is Resultado.Error -> _estado.value = EstadoListaAnimales.Error(resultado.mensaje)
+            }
+            _isRefreshing.value = false
         }
     }
 

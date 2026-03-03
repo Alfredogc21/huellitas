@@ -103,21 +103,36 @@ class AnimalRepository {
 
     /**
      * Sube una imagen al servidor desde un Uri del dispositivo.
+     * Soporta tanto URIs content:// (galería) como file:// (cámara interna CameraX).
      * Devuelve la URL pública de la imagen.
      */
     suspend fun subirImagen(context: Context, uri: Uri): Resultado<String> {
         return try {
             val contentResolver = context.contentResolver
-            val mimeType = contentResolver.getType(uri) ?: "image/jpeg"
-            val inputStream = contentResolver.openInputStream(uri)
-                ?: return Resultado.Error("No se pudo leer la imagen seleccionada.")
+
+            // Para URIs file:// (fotos tomadas con CameraX guardadas en cacheDir)
+            // el ContentResolver no funciona de forma fiable; usamos FileInputStream directo.
+            val inputStream = if (uri.scheme == "file") {
+                val archivo = java.io.File(requireNotNull(uri.path) { "Ruta de archivo nula" })
+                java.io.FileInputStream(archivo)
+            } else {
+                contentResolver.openInputStream(uri)
+            } ?: return Resultado.Error("No se pudo leer la imagen seleccionada.")
+
+            // Determinar MIME type: para file:// siempre jpg (CameraX guarda .jpg)
+            val mimeType = if (uri.scheme == "file") {
+                "image/jpeg"
+            } else {
+                contentResolver.getType(uri) ?: "image/jpeg"
+            }
+
             val bytes = inputStream.readBytes()
             inputStream.close()
 
             val extension = when (mimeType) {
-                "image/png" -> "png"
+                "image/png"  -> "png"
                 "image/webp" -> "webp"
-                else -> "jpg"
+                else         -> "jpg"
             }
             val requestBody = bytes.toRequestBody(mimeType.toMediaTypeOrNull())
             val multipart = MultipartBody.Part.createFormData(

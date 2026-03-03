@@ -6,6 +6,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -14,6 +15,7 @@ import com.example.huellitas.ui.screens.onboarding.PantallaBienvenida
 import com.example.huellitas.ui.screens.onboarding.PantallaIntroduccion
 import com.example.huellitas.ui.screens.registration.PantallaRegistroAnimal
 import com.example.huellitas.ui.screens.splash.PantallaCarga
+import com.example.huellitas.viewmodel.AnimalListViewModel
 
 private const val DURACION_ANIMACION = 400
 
@@ -36,6 +38,10 @@ fun NavHostHuellitas(
     alCompletarBienvenida: () -> Unit
 ) {
     val destinoInicial = if (bienvenidaCompletada) Rutas.INICIO else Rutas.CARGA
+
+    // ViewModel compartido: la pantalla de lista y el callback de registro
+    // comparten la misma instancia para que al registrar se recargue la lista.
+    val listViewModel: AnimalListViewModel = viewModel()
 
     NavHost(
         navController = controladorNav,
@@ -108,13 +114,18 @@ fun NavHostHuellitas(
 
         composable(Rutas.INICIO) {
             PantallaListaAnimales(
-                alNavegarARegistro = { controladorNav.navigate(Rutas.REGISTRAR_ANIMAL) }
+                alNavegarARegistro = { controladorNav.navigate(Rutas.REGISTRAR_ANIMAL) },
+                viewModel = listViewModel
             )
         }
 
         composable(Rutas.REGISTRAR_ANIMAL) {
             PantallaRegistroAnimal(
-                alCompletarRegistro = { controladorNav.popBackStack() }
+                alCompletarRegistro = {
+                    controladorNav.popBackStack()
+                    // Recargar la lista en segundo plano al volver del registro
+                    listViewModel.refrescar()
+                }
             )
         }
     }

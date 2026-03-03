@@ -23,6 +23,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
@@ -72,6 +73,7 @@ fun PantallaListaAnimales(
     viewModel: AnimalListViewModel = viewModel()
 ) {
     val estadoActual by viewModel.estado.collectAsState()
+    val isRefreshing by viewModel.isRefreshing.collectAsState()
 
     var filtroActual by rememberSaveable { mutableStateOf(OpcionFiltro.RECIENTES) }
     var fechaSeleccionada by rememberSaveable { mutableStateOf<Long?>(null) }
@@ -119,10 +121,16 @@ fun PantallaListaAnimales(
             )
         }
     ) { paddingInterno ->
-        Column(
+        PullToRefreshBox(
+            isRefreshing = isRefreshing,
+            onRefresh = { viewModel.refrescar() },
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingInterno)
+        ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
         ) {
             when (estadoActual) {
                 is EstadoListaAnimales.Cargando -> {
@@ -192,6 +200,7 @@ fun PantallaListaAnimales(
                 }
             }
         }
+        } // fin PullToRefreshBox
     }
 }
 

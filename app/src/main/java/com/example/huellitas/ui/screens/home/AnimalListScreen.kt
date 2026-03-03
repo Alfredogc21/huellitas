@@ -1,20 +1,24 @@
 package com.example.huellitas.ui.screens.home
 
 import android.text.format.DateFormat
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Pets
@@ -23,27 +27,31 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -56,6 +64,7 @@ import com.example.huellitas.ui.components.TarjetaAnimal
 import com.example.huellitas.ui.theme.HuellitasTheme
 import com.example.huellitas.viewmodel.AnimalListViewModel
 import com.example.huellitas.viewmodel.EstadoListaAnimales
+import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Date
 
@@ -74,15 +83,35 @@ fun PantallaListaAnimales(
 ) {
     val estadoActual by viewModel.estado.collectAsState()
     val isRefreshing by viewModel.isRefreshing.collectAsState()
+    val isCargandoMas by viewModel.isCargandoMas.collectAsState()
+    val tipoSeleccionado by viewModel.tipoSeleccionado.collectAsState()
 
     var filtroActual by rememberSaveable { mutableStateOf(OpcionFiltro.RECIENTES) }
     var fechaSeleccionada by rememberSaveable { mutableStateOf<Long?>(null) }
     var mostrarCalendario by rememberSaveable { mutableStateOf(false) }
 
+    val listState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
+
     // Aplicar filtro/ordenamiento client-side sobre la lista descargada
     val animalesFiltrados = remember(estadoActual, filtroActual, fechaSeleccionada) {
         val lista = (estadoActual as? EstadoListaAnimales.Exito)?.animales ?: emptyList()
         cuando(filtroActual, fechaSeleccionada, lista)
+    }
+
+    // Detectar cuando se llega al final de la lista para cargar más
+    val debeSolicitarMas by remember {
+        derivedStateOf {
+            val totalItems = listState.layoutInfo.totalItemsCount
+            val ultimoVisible = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+            totalItems > 0 && ultimoVisible >= totalItems - 3
+        }
+    }
+
+    LaunchedEffect(debeSolicitarMas) {
+        if (debeSolicitarMas) {
+            viewModel.cargarMas()
+        }
     }
 
     if (mostrarCalendario) {
@@ -91,22 +120,18 @@ fun PantallaListaAnimales(
                 fechaSeleccionada = milisegundos
                 filtroActual = OpcionFiltro.POR_FECHA
                 mostrarCalendario = false
+                scope.launch { listState.scrollToItem(0) }
             },
             alCancelar = { mostrarCalendario = false }
         )
     }
 
-    val comportamientoScroll = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
-
     Scaffold(
-        modifier = Modifier.nestedScroll(comportamientoScroll.nestedScrollConnection),
         topBar = {
-            LargeTopAppBar(
+            TopAppBar(
                 title = { Text(text = "Huellitas", fontWeight = FontWeight.Bold) },
-                scrollBehavior = comportamientoScroll,
-                colors = TopAppBarDefaults.largeTopAppBarColors(
+                colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surface,
-                    scrolledContainerColor = MaterialTheme.colorScheme.surface,
                     titleContentColor = MaterialTheme.colorScheme.onSurface
                 )
             )
@@ -121,17 +146,33 @@ fun PantallaListaAnimales(
             )
         }
     ) { paddingInterno ->
-        PullToRefreshBox(
-            isRefreshing = isRefreshing,
-            onRefresh = { viewModel.refrescar() },
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingInterno)
         ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
+            // ── Chips de tipo de animal (siempre fijos arriba) ──
+            FilaTipoAnimal(
+                tipoSeleccionado = tipoSeleccionado,
+                alSeleccionarTipo = { idTipo ->
+                    viewModel.seleccionarTipo(idTipo)
+                    scope.launch { listState.scrollToItem(0) }
+                }
+            )
+
+            // ── Chips de ordenamiento/fecha (siempre fijos arriba) ──
+            FilaChipsFiltro(
+                filtroActual = filtroActual,
+                fechaSeleccionada = fechaSeleccionada,
+                alSeleccionarFiltro = { opcion ->
+                    filtroActual = opcion
+                    if (opcion != OpcionFiltro.POR_FECHA) fechaSeleccionada = null
+                    scope.launch { listState.scrollToItem(0) }
+                },
+                alSolicitarCalendario = { mostrarCalendario = true }
+            )
+
+            // ── Contenido principal con pull-to-refresh ──
             when (estadoActual) {
                 is EstadoListaAnimales.Cargando -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -147,17 +188,6 @@ fun PantallaListaAnimales(
                 }
 
                 is EstadoListaAnimales.Exito -> {
-                    // ── Chips de filtro ──
-                    FilaChipsFiltro(
-                        filtroActual = filtroActual,
-                        fechaSeleccionada = fechaSeleccionada,
-                        alSeleccionarFiltro = { opcion ->
-                            filtroActual = opcion
-                            if (opcion != OpcionFiltro.POR_FECHA) fechaSeleccionada = null
-                        },
-                        alSolicitarCalendario = { mostrarCalendario = true }
-                    )
-
                     // ── Contador de resultados ──
                     val textoContador = if (filtroActual == OpcionFiltro.POR_FECHA && fechaSeleccionada != null) {
                         val fechaTexto = DateFormat.format("dd MMM yyyy", Date(fechaSeleccionada!!)).toString()
@@ -173,34 +203,87 @@ fun PantallaListaAnimales(
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
                     )
 
-                    // ── Lista de animales ──
-                    AnimatedVisibility(
-                        visible = animalesFiltrados.isNotEmpty(),
-                        enter = fadeIn(),
-                        exit = fadeOut()
+                    // ── Lista con pull-to-refresh ──
+                    PullToRefreshBox(
+                        isRefreshing = isRefreshing,
+                        onRefresh = { viewModel.refrescar() },
+                        modifier = Modifier.fillMaxSize()
                     ) {
-                        LazyColumn(
-                            contentPadding = PaddingValues(
-                                start = 16.dp,
-                                end = 16.dp,
-                                top = 8.dp,
-                                bottom = 88.dp
-                            ),
-                            verticalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-                            items(items = animalesFiltrados, key = { it.id }) { animal ->
-                                TarjetaAnimal(animal = animal)
+                        if (animalesFiltrados.isEmpty()) {
+                            EstadoVacio()
+                        } else {
+                            LazyColumn(
+                                state = listState,
+                                contentPadding = PaddingValues(
+                                    start = 16.dp,
+                                    end = 16.dp,
+                                    top = 8.dp,
+                                    bottom = 88.dp
+                                ),
+                                verticalArrangement = Arrangement.spacedBy(16.dp)
+                            ) {
+                                items(items = animalesFiltrados, key = { it.id }) { animal ->
+                                    TarjetaAnimal(animal = animal)
+                                }
+
+                                // Indicador de carga al final de la lista
+                                if (isCargandoMas) {
+                                    item {
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(16.dp),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            CircularProgressIndicator(
+                                                modifier = Modifier.size(24.dp),
+                                                strokeWidth = 2.dp
+                                            )
+                                        }
+                                    }
+                                }
                             }
                         }
-                    }
-
-                    if (animalesFiltrados.isEmpty()) {
-                        EstadoVacio()
                     }
                 }
             }
         }
-        } // fin PullToRefreshBox
+    }
+}
+
+/**
+ * Fila de chips para filtrar por tipo de animal.
+ */
+@Composable
+private fun FilaTipoAnimal(
+    tipoSeleccionado: Int?,
+    alSeleccionarTipo: (Int?) -> Unit
+) {
+    val tipos = listOf(
+        null to "Todos",
+        1 to "\uD83D\uDC36 Perro",
+        2 to "\uD83D\uDC31 Gato",
+        3 to "Otro"
+    )
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .horizontalScroll(rememberScrollState())
+            .padding(horizontal = 16.dp, vertical = 4.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        tipos.forEach { (id, label) ->
+            FilterChip(
+                selected = tipoSeleccionado == id,
+                onClick = { alSeleccionarTipo(id) },
+                label = { Text(label) },
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                    selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            )
+        }
     }
 }
 

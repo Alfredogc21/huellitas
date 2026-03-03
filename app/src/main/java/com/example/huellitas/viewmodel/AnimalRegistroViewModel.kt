@@ -72,6 +72,10 @@ class AnimalRegistroViewModel(
             _estadoRegistro.value = EstadoRegistro.Error("La ubicación es obligatoria.")
             return
         }
+        if (contacto.isBlank()) {
+            _estadoRegistro.value = EstadoRegistro.Error("El teléfono o email de contacto es obligatorio.")
+            return
+        }
 
         val idTipo = when (tipo) {
             TipoAnimal.PERRO -> 1

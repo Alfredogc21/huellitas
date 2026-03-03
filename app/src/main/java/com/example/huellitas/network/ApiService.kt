@@ -22,12 +22,16 @@ interface ApiService {
     @GET("api/animales/listar.php")
     suspend fun listarAnimales(
         @Query("orden") orden: String = "fecha_registro",
-        @Query("direccion") direccion: String = "DESC"
+        @Query("direccion") direccion: String = "DESC",
+        @Query("pagina") pagina: Int = 1,
+        @Query("limite") limite: Int = 10
     ): Response<ApiResponse<List<AnimalDto>>>
 
     @GET("api/animales/listar.php")
     suspend fun listarAnimalesPorTipo(
-        @Query("tipo") idTipo: Int
+        @Query("tipo") idTipo: Int,
+        @Query("pagina") pagina: Int = 1,
+        @Query("limite") limite: Int = 10
     ): Response<ApiResponse<List<AnimalDto>>>
 
     @POST("api/animales/crear.php")

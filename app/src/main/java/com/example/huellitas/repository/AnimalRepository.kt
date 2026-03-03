@@ -1,6 +1,8 @@
 package com.example.huellitas.repository
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import com.example.huellitas.model.Animal
 import com.example.huellitas.model.TipoAnimal
@@ -10,6 +12,7 @@ import com.example.huellitas.network.dto.CrearAnimalRequest
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -35,9 +38,9 @@ class AnimalRepository {
     /**
      * Obtiene todos los animales del servidor, ordenados por fecha descendente.
      */
-    suspend fun obtenerAnimales(): Resultado<List<Animal>> {
+    suspend fun obtenerAnimales(pagina: Int = 1, limite: Int = 10): Resultado<List<Animal>> {
         return try {
-            val response = api.listarAnimales()
+            val response = api.listarAnimales(pagina = pagina, limite = limite)
             if (response.isSuccessful && response.body()?.status == true) {
                 val lista = response.body()!!.data?.map { it.aModelo() } ?: emptyList()
                 Resultado.Exito(lista)
@@ -53,9 +56,9 @@ class AnimalRepository {
      * Obtiene animales filtrados por tipo.
      * @param idTipo 1=Perro, 2=Gato, 3=Otro
      */
-    suspend fun obtenerAnimalesPorTipo(idTipo: Int): Resultado<List<Animal>> {
+    suspend fun obtenerAnimalesPorTipo(idTipo: Int, pagina: Int = 1, limite: Int = 10): Resultado<List<Animal>> {
         return try {
-            val response = api.listarAnimalesPorTipo(idTipo)
+            val response = api.listarAnimalesPorTipo(idTipo, pagina = pagina, limite = limite)
             if (response.isSuccessful && response.body()?.status == true) {
                 val lista = response.body()!!.data?.map { it.aModelo() } ?: emptyList()
                 Resultado.Exito(lista)
@@ -119,25 +122,14 @@ class AnimalRepository {
                 contentResolver.openInputStream(uri)
             } ?: return Resultado.Error("No se pudo leer la imagen seleccionada.")
 
-            // Determinar MIME type: para file:// siempre jpg (CameraX guarda .jpg)
-            val mimeType = if (uri.scheme == "file") {
-                "image/jpeg"
-            } else {
-                contentResolver.getType(uri) ?: "image/jpeg"
-            }
-
-            val bytes = inputStream.readBytes()
+            // Comprimir imagen antes de subir para acelerar la carga
+            val bytes = comprimirImagen(inputStream.readBytes())
             inputStream.close()
 
-            val extension = when (mimeType) {
-                "image/png"  -> "png"
-                "image/webp" -> "webp"
-                else         -> "jpg"
-            }
-            val requestBody = bytes.toRequestBody(mimeType.toMediaTypeOrNull())
+            val requestBody = bytes.toRequestBody("image/jpeg".toMediaTypeOrNull())
             val multipart = MultipartBody.Part.createFormData(
                 "imagen",
-                "foto_animal.$extension",
+                "foto_animal.jpg",
                 requestBody
             )
 
@@ -147,7 +139,12 @@ class AnimalRepository {
                     ?: return Resultado.Error("No se recibió la URL de la imagen.")
                 Resultado.Exito(url)
             } else {
-                Resultado.Error(response.body()?.message ?: "Error al subir la imagen")
+                // Extraer mensaje real del servidor para diagnóstico
+                val mensajeServidor = response.body()?.message
+                    ?: try {
+                        response.errorBody()?.string()?.take(200)
+                    } catch (_: Exception) { null }
+                Resultado.Error(mensajeServidor ?: "Error al subir la imagen (HTTP ${response.code()})")
             }
         } catch (e: Exception) {
             Resultado.Error("Error al subir imagen: ${e.localizedMessage}")
@@ -178,5 +175,49 @@ class AnimalRepository {
             imagenUrl = imagenUrl,
             fechaRegistro = fecha
         )
+    }
+
+    /**
+     * Comprime una imagen a JPEG redimensionando a máximo 1280px de lado mayor
+     * y calidad 75%. Reduce de ~5-10MB (CameraX) a ~100-300KB.
+     */
+    private fun comprimirImagen(bytesOriginal: ByteArray): ByteArray {
+        val opciones = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        BitmapFactory.decodeByteArray(bytesOriginal, 0, bytesOriginal.size, opciones)
+
+        val anchoOriginal = opciones.outWidth
+        val altoOriginal = opciones.outHeight
+        val ladoMax = 1280
+
+        // Calcular inSampleSize para reducir memoria al decodificar
+        var inSampleSize = 1
+        if (anchoOriginal > ladoMax || altoOriginal > ladoMax) {
+            val mitadAncho = anchoOriginal / 2
+            val mitadAlto = altoOriginal / 2
+            while (mitadAncho / inSampleSize >= ladoMax && mitadAlto / inSampleSize >= ladoMax) {
+                inSampleSize *= 2
+            }
+        }
+
+        val opcionesDeco = BitmapFactory.Options().apply { this.inSampleSize = inSampleSize }
+        val bitmap = BitmapFactory.decodeByteArray(bytesOriginal, 0, bytesOriginal.size, opcionesDeco)
+            ?: return bytesOriginal
+
+        // Escalar al tamaño final exacto si sigue siendo mayor a ladoMax
+        val bitmapFinal = if (bitmap.width > ladoMax || bitmap.height > ladoMax) {
+            val escala = ladoMax.toFloat() / maxOf(bitmap.width, bitmap.height)
+            val nuevoAncho = (bitmap.width * escala).toInt()
+            val nuevoAlto = (bitmap.height * escala).toInt()
+            val escalado = Bitmap.createScaledBitmap(bitmap, nuevoAncho, nuevoAlto, true)
+            if (escalado !== bitmap) bitmap.recycle()
+            escalado
+        } else {
+            bitmap
+        }
+
+        val salida = ByteArrayOutputStream()
+        bitmapFinal.compress(Bitmap.CompressFormat.JPEG, 75, salida)
+        bitmapFinal.recycle()
+        return salida.toByteArray()
     }
 }

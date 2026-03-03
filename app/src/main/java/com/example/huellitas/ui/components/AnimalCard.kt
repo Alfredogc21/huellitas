@@ -1,6 +1,7 @@
 package com.example.huellitas.ui.components
 
 import android.text.format.DateFormat
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,6 +25,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,6 +40,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.example.huellitas.model.Animal
 import com.example.huellitas.model.TipoAnimal
@@ -60,6 +66,17 @@ fun TarjetaAnimal(
     animal: Animal,
     modifier: Modifier = Modifier
 ) {
+    var mostrarZoom by remember { mutableStateOf(false) }
+
+    // Diálogo de zoom a pantalla completa
+    if (mostrarZoom && animal.imagenUrl != null) {
+        DialogoZoomImagen(
+            imagenUrl = animal.imagenUrl,
+            descripcion = "Foto de ${animal.nombre}",
+            alCerrar = { mostrarZoom = false }
+        )
+    }
+
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.medium,
@@ -77,15 +94,20 @@ fun TarjetaAnimal(
                     .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
             ) {
                 if (animal.imagenUrl != null) {
-                    // Carga de imagen desde URL con Coil
+                    // Carga de imagen desde URL con Coil (cacheada en disco y memoria)
                     AsyncImage(
                         model = ImageRequest.Builder(LocalContext.current)
                             .data(animal.imagenUrl)
                             .crossfade(true)
+                            .size(600, 400)
+                            .memoryCachePolicy(CachePolicy.ENABLED)
+                            .diskCachePolicy(CachePolicy.ENABLED)
                             .build(),
                         contentDescription = "Foto de ${animal.nombre}",
                         contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clickable { mostrarZoom = true }
                     )
                 } else {
                     // Placeholder cuando no hay imagen

@@ -1,0 +1,97 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="300dp"
+    android:height="300dp"
+    android:viewportWidth="300"
+    android:viewportHeight="300">
+
+    <!-- Background -->
+    <path
+        android:fillColor="#E0D4C8"
+        android:pathData="M0,0h300v300H0z" />
+
+    <!-- Puppy body -->
+    <path
+        android:fillColor="#D4A574"
+        android:pathData="M95,280 C95,225 88,195 105,168 C115,152 130,145 150,143 C170,145 185,152 195,168 C212,195 205,225 205,280 Z" />
+
+    <!-- Puppy head -->
+    <path
+        android:fillColor="#D4A574"
+        android:pathData="M108,168 C92,155 85,132 92,110 C99,88 122,75 150,75 C178,75 201,88 208,110 C215,132 208,155 192,168 C182,175 168,178 150,178 C132,178 118,175 108,168 Z" />
+
+    <!-- Left ear (droopy puppy ear) -->
+    <path
+        android:fillColor="#B8864E"
+        android:pathData="M100,118 C85,105 70,100 62,108 C54,116 58,140 75,158 C85,168 98,160 100,148 Z" />
+
+    <!-- Right ear (droopy puppy ear) -->
+    <path
+        android:fillColor="#B8864E"
+        android:pathData="M200,118 C215,105 230,100 238,108 C246,116 242,140 225,158 C215,168 202,160 200,148 Z" />
+
+    <!-- Face patch (lighter) -->
+    <path
+        android:fillColor="#E8C9A0"
+        android:pathData="M125,120 C120,128 120,148 135,158 C142,162 158,162 165,158 C180,148 180,128 175,120 C168,112 132,112 125,120 Z" />
+
+    <!-- Left eye -->
+    <path
+        android:fillColor="#3D2B1A"
+        android:pathData="M125,112 a 8,9 0 1 0 16,0 a 8,9 0 1 0 -16,0" />
+
+    <!-- Right eye -->
+    <path
+        android:fillColor="#3D2B1A"
+        android:pathData="M159,112 a 8,9 0 1 0 16,0 a 8,9 0 1 0 -16,0" />
+
+    <!-- Eye highlights -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M129,108 a 3,3 0 1 0 6,0 a 3,3 0 1 0 -6,0" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M163,108 a 3,3 0 1 0 6,0 a 3,3 0 1 0 -6,0" />
+
+    <!-- Puppy nose -->
+    <path
+        android:fillColor="#3D2B1A"
+        android:pathData="M140,130 C137,127 138,122 145,120 C150,119 155,120 158,122 C162,127 161,130 157,133 C153,135 144,135 140,130 Z" />
+
+    <!-- Nose highlight -->
+    <path
+        android:fillColor="#5C4033"
+        android:pathData="M143,124 a 3,2 0 1 0 6,0 a 3,2 0 1 0 -6,0" />
+
+    <!-- Mouth -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#3D2B1A"
+        android:strokeWidth="2"
+        android:pathData="M150,133 L150,142 M143,142 C146,148 150,150 150,142 M150,142 C150,150 154,148 157,142" />
+
+    <!-- Collar -->
+    <path
+        android:fillColor="#E53935"
+        android:pathData="M112,170 C125,178 140,180 150,180 C160,180 175,178 188,170 C190,175 185,182 175,186 C165,190 155,192 150,192 C145,192 135,190 125,186 C115,182 110,175 112,170 Z" />
+
+    <!-- Collar tag -->
+    <path
+        android:fillColor="#FFD700"
+        android:pathData="M145,190 a 7,8 0 1 0 14,0 a 7,8 0 1 0 -14,0" />
+
+    <!-- Front paws -->
+    <path
+        android:fillColor="#D4A574"
+        android:pathData="M110,260 C105,275 108,285 120,285 C132,285 135,275 130,260 Z" />
+    <path
+        android:fillColor="#D4A574"
+        android:pathData="M170,260 C165,275 168,285 180,285 C192,285 195,275 190,260 Z" />
+
+    <!-- Paw details -->
+    <path
+        android:fillColor="#E8C9A0"
+        android:pathData="M113,278 a 3,2 0 1 0 6,0 M119,278 a 3,2 0 1 0 6,0 M125,278 a 3,2 0 1 0 6,0" />
+    <path
+        android:fillColor="#E8C9A0"
+        android:pathData="M173,278 a 3,2 0 1 0 6,0 M179,278 a 3,2 0 1 0 6,0 M185,278 a 3,2 0 1 0 6,0" />
+</vector>

@@ -6,6 +6,7 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -32,6 +33,8 @@ import androidx.compose.material.icons.outlined.Pets
 import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.material.icons.outlined.PhotoCamera
 import androidx.compose.material3.Button
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -72,7 +75,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.huellitas.model.TipoAnimal
 import com.example.huellitas.ui.screens.camera.PantallaCamara
+import com.example.huellitas.ui.theme.GradientStart
 import com.example.huellitas.ui.theme.HuellitasTheme
+import com.example.huellitas.ui.theme.PurpleDark
+import com.example.huellitas.ui.theme.PurpleText
 import com.example.huellitas.viewmodel.AnimalRegistroViewModel
 import com.example.huellitas.viewmodel.EstadoRegistro
 import kotlinx.coroutines.launch
@@ -181,11 +187,16 @@ fun PantallaRegistroAnimal(
                 title = { Text(text = "Registrar animal", fontWeight = FontWeight.SemiBold) },
                 navigationIcon = {
                     IconButton(onClick = alCompletarRegistro) {
-                        Icon(imageVector = Icons.Outlined.ArrowBack, contentDescription = "Volver")
+                        Icon(
+                            imageVector = Icons.Outlined.ArrowBack,
+                            contentDescription = "Volver",
+                            tint = androidx.compose.ui.graphics.Color.White
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface
+                    containerColor = GradientStart,
+                    titleContentColor = androidx.compose.ui.graphics.Color.White
                 )
             )
         },
@@ -202,6 +213,7 @@ fun PantallaRegistroAnimal(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(androidx.compose.ui.graphics.Color(0xFFF5F0FA))
                 .padding(paddingInterno)
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 24.dp),
@@ -212,7 +224,7 @@ fun PantallaRegistroAnimal(
             Text(
                 text = "¡Comparte la información del animal para que reciba ayuda!",
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = PurpleDark,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -252,7 +264,17 @@ fun PantallaRegistroAnimal(
                 leadingIcon = { Icon(Icons.Outlined.Pets, contentDescription = null) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                shape = MaterialTheme.shapes.medium
+                shape = MaterialTheme.shapes.medium,
+                colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = androidx.compose.ui.graphics.Color(0xFF1D1A20),
+                    unfocusedTextColor = androidx.compose.ui.graphics.Color(0xFF1D1A20),
+                    focusedLabelColor = PurpleDark,
+                    unfocusedLabelColor = androidx.compose.ui.graphics.Color(0xFF49454F),
+                    focusedLeadingIconColor = PurpleDark,
+                    unfocusedLeadingIconColor = androidx.compose.ui.graphics.Color(0xFF49454F),
+                    focusedBorderColor = GradientStart,
+                    unfocusedBorderColor = androidx.compose.ui.graphics.Color(0xFF9B8FA8)
+                )
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -264,7 +286,17 @@ fun PantallaRegistroAnimal(
                 leadingIcon = { Icon(Icons.Outlined.Category, contentDescription = null) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                shape = MaterialTheme.shapes.medium
+                shape = MaterialTheme.shapes.medium,
+                colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = androidx.compose.ui.graphics.Color(0xFF1D1A20),
+                    unfocusedTextColor = androidx.compose.ui.graphics.Color(0xFF1D1A20),
+                    focusedLabelColor = PurpleDark,
+                    unfocusedLabelColor = androidx.compose.ui.graphics.Color(0xFF49454F),
+                    focusedLeadingIconColor = PurpleDark,
+                    unfocusedLeadingIconColor = androidx.compose.ui.graphics.Color(0xFF49454F),
+                    focusedBorderColor = GradientStart,
+                    unfocusedBorderColor = androidx.compose.ui.graphics.Color(0xFF9B8FA8)
+                )
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -277,7 +309,17 @@ fun PantallaRegistroAnimal(
                 modifier = Modifier.fillMaxWidth(),
                 minLines = 3,
                 maxLines = 5,
-                shape = MaterialTheme.shapes.medium
+                shape = MaterialTheme.shapes.medium,
+                colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = androidx.compose.ui.graphics.Color(0xFF1D1A20),
+                    unfocusedTextColor = androidx.compose.ui.graphics.Color(0xFF1D1A20),
+                    focusedLabelColor = PurpleDark,
+                    unfocusedLabelColor = androidx.compose.ui.graphics.Color(0xFF49454F),
+                    focusedLeadingIconColor = PurpleDark,
+                    unfocusedLeadingIconColor = androidx.compose.ui.graphics.Color(0xFF49454F),
+                    focusedBorderColor = GradientStart,
+                    unfocusedBorderColor = androidx.compose.ui.graphics.Color(0xFF9B8FA8)
+                )
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -294,7 +336,17 @@ fun PantallaRegistroAnimal(
                 leadingIcon = { Icon(Icons.Outlined.LocationOn, contentDescription = null) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                shape = MaterialTheme.shapes.medium
+                shape = MaterialTheme.shapes.medium,
+                colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = androidx.compose.ui.graphics.Color(0xFF1D1A20),
+                    unfocusedTextColor = androidx.compose.ui.graphics.Color(0xFF1D1A20),
+                    focusedLabelColor = PurpleDark,
+                    unfocusedLabelColor = androidx.compose.ui.graphics.Color(0xFF49454F),
+                    focusedLeadingIconColor = PurpleDark,
+                    unfocusedLeadingIconColor = androidx.compose.ui.graphics.Color(0xFF49454F),
+                    focusedBorderColor = GradientStart,
+                    unfocusedBorderColor = androidx.compose.ui.graphics.Color(0xFF9B8FA8)
+                )
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -306,7 +358,17 @@ fun PantallaRegistroAnimal(
                 leadingIcon = { Icon(Icons.Outlined.Phone, contentDescription = null) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                shape = MaterialTheme.shapes.medium
+                shape = MaterialTheme.shapes.medium,
+                colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = androidx.compose.ui.graphics.Color(0xFF1D1A20),
+                    unfocusedTextColor = androidx.compose.ui.graphics.Color(0xFF1D1A20),
+                    focusedLabelColor = PurpleDark,
+                    unfocusedLabelColor = androidx.compose.ui.graphics.Color(0xFF49454F),
+                    focusedLeadingIconColor = PurpleDark,
+                    unfocusedLeadingIconColor = androidx.compose.ui.graphics.Color(0xFF49454F),
+                    focusedBorderColor = GradientStart,
+                    unfocusedBorderColor = androidx.compose.ui.graphics.Color(0xFF9B8FA8)
+                )
             )
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -327,7 +389,11 @@ fun PantallaRegistroAnimal(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
-                shape = MaterialTheme.shapes.large
+                shape = MaterialTheme.shapes.large,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = GradientStart,
+                    contentColor = androidx.compose.ui.graphics.Color.White
+                )
             ) {
                 if (estandoEnviando) {
                     CircularProgressIndicator(
@@ -372,7 +438,7 @@ private fun EncabezadoSeccion(texto: String) {
         text = texto,
         style = MaterialTheme.typography.titleSmall,
         fontWeight = FontWeight.SemiBold,
-        color = MaterialTheme.colorScheme.onSurface,
+        color = PurpleDark,
         modifier = Modifier.fillMaxWidth()
     )
 }
@@ -453,13 +519,13 @@ private fun ZonaSubirFoto(
                     imageVector = Icons.Outlined.PhotoCamera,
                     contentDescription = "Subir foto",
                     modifier = Modifier.size(40.dp),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                    tint = PurpleDark
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = "Toca para agregar una foto",
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                    color = PurpleDark
                 )
             }
         }
@@ -480,7 +546,8 @@ private fun SelectorTipoAnimal(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        TipoAnimal.entries.forEach { tipo ->
+        // TipoAnimal.entries.forEach { tipo ->  // Oculto: muestra todos los tipos
+        listOf(TipoAnimal.PERRO).forEach { tipo -> // Gato y Otro ocultos temporalmente
             val estaSeleccionado = tipo == tipoSeleccionado
             FilterChip(
                 selected = estaSeleccionado,
@@ -493,8 +560,9 @@ private fun SelectorTipoAnimal(
                 },
                 modifier = Modifier.weight(1f),
                 colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                    selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    selectedContainerColor = GradientStart.copy(alpha = 0.15f),
+                    selectedLabelColor = PurpleDark,
+                    labelColor = androidx.compose.ui.graphics.Color(0xFF1D1A20)
                 )
             )
         }

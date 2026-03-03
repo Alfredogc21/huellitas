@@ -1,6 +1,8 @@
 package com.example.huellitas.ui.screens.home
 
 import android.text.format.DateFormat
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,11 +21,13 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Pets
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
@@ -52,6 +56,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -61,7 +69,11 @@ import com.example.huellitas.model.Animal
 import com.example.huellitas.model.OpcionFiltro
 import com.example.huellitas.ui.components.FilaChipsFiltro
 import com.example.huellitas.ui.components.TarjetaAnimal
+import com.example.huellitas.ui.theme.GradientEnd
+import com.example.huellitas.ui.theme.GradientStart
 import com.example.huellitas.ui.theme.HuellitasTheme
+import com.example.huellitas.ui.theme.PurpleDark
+import com.example.huellitas.ui.theme.PurpleText
 import com.example.huellitas.viewmodel.AnimalListViewModel
 import com.example.huellitas.viewmodel.EstadoListaAnimales
 import kotlinx.coroutines.launch
@@ -129,10 +141,24 @@ fun PantallaListaAnimales(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = "Huellitas", fontWeight = FontWeight.Bold) },
+                title = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        androidx.compose.foundation.Image(
+                            painter = androidx.compose.ui.res.painterResource(id = com.example.huellitas.R.drawable.logo_huellitas),
+                            contentDescription = null,
+                            modifier = Modifier.size(36.dp)
+                        )
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(
+                            text = "Huellitas a Salvo",
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    titleContentColor = MaterialTheme.colorScheme.onSurface
+                    containerColor = GradientStart,
+                    titleContentColor = Color.White
                 )
             )
         },
@@ -141,14 +167,15 @@ fun PantallaListaAnimales(
                 onClick = alNavegarARegistro,
                 icon = { Icon(Icons.Outlined.Add, contentDescription = "Registrar animal") },
                 text = { Text("Registrar") },
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                containerColor = GradientStart,
+                contentColor = Color.White
             )
         }
     ) { paddingInterno ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(Color(0xFFF5F0FA))
                 .padding(paddingInterno)
         ) {
             // ── Chips de tipo de animal (siempre fijos arriba) ──
@@ -199,7 +226,8 @@ fun PantallaListaAnimales(
                     Text(
                         text = textoContador,
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontWeight = FontWeight.Medium,
+                        color = PurpleDark,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
                     )
 
@@ -261,9 +289,9 @@ private fun FilaTipoAnimal(
 ) {
     val tipos = listOf(
         null to "Todos",
-        1 to "\uD83D\uDC36 Perro",
-        2 to "\uD83D\uDC31 Gato",
-        3 to "Otro"
+        1 to "\uD83D\uDC36 Perro"
+        // 2 to "\uD83D\uDC31 Gato",   // Oculto temporalmente
+        // 3 to "Otro"                   // Oculto temporalmente
     )
 
     Row(
@@ -279,8 +307,9 @@ private fun FilaTipoAnimal(
                 onClick = { alSeleccionarTipo(id) },
                 label = { Text(label) },
                 colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                    selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    selectedContainerColor = GradientStart.copy(alpha = 0.15f),
+                    selectedLabelColor = PurpleDark,
+                    labelColor = Color(0xFF1D1A20)
                 )
             )
         }
@@ -389,7 +418,13 @@ private fun EstadoError(mensaje: String, alReintentar: () -> Unit) {
             textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.height(24.dp))
-        Button(onClick = alReintentar) {
+        Button(
+            onClick = alReintentar,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = GradientStart,
+                contentColor = Color.White
+            )
+        ) {
             Icon(Icons.Outlined.Refresh, contentDescription = null, modifier = Modifier.size(18.dp))
             Spacer(modifier = Modifier.height(8.dp))
             Text("Reintentar")

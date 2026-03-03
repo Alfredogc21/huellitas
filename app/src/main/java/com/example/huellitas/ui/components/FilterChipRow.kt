@@ -88,9 +88,11 @@ fun FilaChipsFiltro(
                     )
                 },
                 colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                    selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    selectedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    selectedContainerColor = com.example.huellitas.ui.theme.GradientStart.copy(alpha = 0.15f),
+                    selectedLabelColor = com.example.huellitas.ui.theme.PurpleDark,
+                    selectedLeadingIconColor = com.example.huellitas.ui.theme.PurpleDark,
+                    labelColor = androidx.compose.ui.graphics.Color(0xFF1D1A20),
+                    iconColor = androidx.compose.ui.graphics.Color(0xFF49454F)
                 )
             )
         }

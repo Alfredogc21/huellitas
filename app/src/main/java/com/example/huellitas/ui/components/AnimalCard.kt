@@ -32,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -46,7 +47,9 @@ import com.example.huellitas.model.Animal
 import com.example.huellitas.model.TipoAnimal
 import com.example.huellitas.ui.theme.CatChip
 import com.example.huellitas.ui.theme.DogChip
+import com.example.huellitas.ui.theme.GradientStart
 import com.example.huellitas.ui.theme.HuellitasTheme
+import com.example.huellitas.ui.theme.PurpleDark
 import java.util.Date
 
 /**
@@ -79,11 +82,11 @@ fun TarjetaAnimal(
 
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.medium,
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = Color.White
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column {
             // ── Imagen del animal con badge de tipo ──
@@ -137,7 +140,7 @@ fun TarjetaAnimal(
                 val colorBadge = when (animal.tipo) {
                     TipoAnimal.PERRO -> DogChip
                     TipoAnimal.GATO -> CatChip
-                    TipoAnimal.OTRO -> MaterialTheme.colorScheme.tertiary
+                    TipoAnimal.OTRO -> GradientStart
                 }
 
                 Surface(
@@ -166,7 +169,7 @@ fun TarjetaAnimal(
                     text = animal.nombre.ifEmpty { "Animal sin nombre" },
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface,
+                    color = Color(0xFF1D1A20),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -175,7 +178,7 @@ fun TarjetaAnimal(
                     Text(
                         text = animal.raza,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = Color(0xFF49454F)
                     )
                 }
 
@@ -186,7 +189,7 @@ fun TarjetaAnimal(
                 Text(
                     text = animal.descripcion,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
+                    color = Color(0xFF49454F),
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -231,12 +234,12 @@ private fun FilaInfo(
             imageVector = icono,
             contentDescription = descripcionContenido,
             modifier = Modifier.size(18.dp),
-            tint = MaterialTheme.colorScheme.primary
+            tint = GradientStart
         )
         Text(
             text = texto,
             style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            color = Color(0xFF5E5A66),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )

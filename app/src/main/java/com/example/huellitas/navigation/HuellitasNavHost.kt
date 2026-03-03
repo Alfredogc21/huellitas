@@ -87,7 +87,12 @@ fun NavHostHuellitas(
 
         composable(Rutas.BIENVENIDA) {
             PantallaBienvenida(
-                alSiguiente = { controladorNav.navigate(Rutas.INTRODUCCION) }
+                alSiguiente = {
+                    alCompletarBienvenida()
+                    controladorNav.navigate(Rutas.INICIO) {
+                        popUpTo(Rutas.CARGA) { inclusive = true }
+                    }
+                }
             )
         }
 

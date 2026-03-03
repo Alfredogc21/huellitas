@@ -1,16 +1,17 @@
 package com.example.huellitas.ui.screens.onboarding
 
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,14 +19,14 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Pets
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -36,32 +37,44 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.Fill
+import androidx.compose.foundation.Canvas
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import com.example.huellitas.ui.components.IndicadorPagina
+import androidx.compose.ui.unit.sp
+import com.example.huellitas.R
 import com.example.huellitas.ui.theme.GradientDarkEnd
 import com.example.huellitas.ui.theme.GradientDarkStart
 import com.example.huellitas.ui.theme.GradientEnd
 import com.example.huellitas.ui.theme.GradientStart
 import com.example.huellitas.ui.theme.HuellitasTheme
-import com.example.huellitas.ui.theme.PrimaryLight
+import com.example.huellitas.ui.theme.PurpleDark
+import com.example.huellitas.ui.theme.PurpleText
 import kotlinx.coroutines.delay
 
 /**
- * Primera pantalla de bienvenida con gradiente y animaciones.
+ * Pantalla de bienvenida que replica el diseño del cliente.
  *
- * Muestra el logo, nombre y eslogan de la app con elementos
- * decorativos flotantes y animaciones de entrada escalonadas.
- * Solo se muestra en el primer inicio de la aplicación.
+ * Muestra un fondo degradado púrpura con una forma de chevron blanco
+ * en la parte superior que contiene el logo y nombre "Huellitas a Salvo".
+ * Debajo muestra 3 imágenes de mascotas en un collage con esquinas
+ * redondeadas, el texto "peluditos que necesitan de tu ayuda" y
+ * un botón blanco "iniciar".
  *
- * @param alSiguiente Callback para navegar a la pantalla de introducción
+ * @param alSiguiente Callback para navegar a la siguiente pantalla
  */
 @Composable
 fun PantallaBienvenida(alSiguiente: () -> Unit) {
+
     val esModoOscuro = isSystemInDarkTheme()
     val coloresGradiente = if (esModoOscuro) {
         listOf(GradientDarkStart, GradientDarkEnd)
@@ -71,8 +84,8 @@ fun PantallaBienvenida(alSiguiente: () -> Unit) {
 
     // ── Animaciones de entrada escalonada ──
     var logoVisible by remember { mutableStateOf(false) }
-    var tituloVisible by remember { mutableStateOf(false) }
-    var subtituloVisible by remember { mutableStateOf(false) }
+    var imagenesVisibles by remember { mutableStateOf(false) }
+    var textoVisible by remember { mutableStateOf(false) }
     var botonVisible by remember { mutableStateOf(false) }
 
     val alfaLogo by animateFloatAsState(
@@ -80,15 +93,15 @@ fun PantallaBienvenida(alSiguiente: () -> Unit) {
         animationSpec = tween(durationMillis = 600),
         label = "alfa_logo"
     )
-    val alfaTitulo by animateFloatAsState(
-        targetValue = if (tituloVisible) 1f else 0f,
-        animationSpec = tween(durationMillis = 600),
-        label = "alfa_titulo"
+    val alfaImagenes by animateFloatAsState(
+        targetValue = if (imagenesVisibles) 1f else 0f,
+        animationSpec = tween(durationMillis = 700),
+        label = "alfa_imagenes"
     )
-    val alfaSubtitulo by animateFloatAsState(
-        targetValue = if (subtituloVisible) 1f else 0f,
+    val alfaTexto by animateFloatAsState(
+        targetValue = if (textoVisible) 1f else 0f,
         animationSpec = tween(durationMillis = 600),
-        label = "alfa_subtitulo"
+        label = "alfa_texto"
     )
     val alfaBoton by animateFloatAsState(
         targetValue = if (botonVisible) 1f else 0f,
@@ -96,178 +109,170 @@ fun PantallaBienvenida(alSiguiente: () -> Unit) {
         label = "alfa_boton"
     )
 
-    // Entrada escalonada de elementos
     LaunchedEffect(Unit) {
         logoVisible = true
         delay(300)
-        tituloVisible = true
+        imagenesVisibles = true
         delay(300)
-        subtituloVisible = true
-        delay(300)
+        textoVisible = true
+        delay(200)
         botonVisible = true
     }
 
-    // ── Animaciones flotantes de fondo ──
-    val transicionInfinita = rememberInfiniteTransition(label = "flotante")
-    val desplazamiento1 by transicionInfinita.animateFloat(
-        initialValue = 0f,
-        targetValue = 15f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(3000),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "desplazamiento_1"
-    )
-    val desplazamiento2 by transicionInfinita.animateFloat(
-        initialValue = 0f,
-        targetValue = -12f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(2500),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "desplazamiento_2"
-    )
-
-    Box(
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
             .background(brush = Brush.verticalGradient(coloresGradiente))
-            .systemBarsPadding()
     ) {
-        // ── Elementos decorativos flotantes ──
-        CirculoDecorativo(
-            tamano = 120,
-            alfa = 0.08f,
-            offsetX = -30,
-            offsetY = 80 + desplazamiento1.toInt()
-        )
-        CirculoDecorativo(
-            tamano = 80,
-            alfa = 0.06f,
-            offsetX = 280,
-            offsetY = 150 + desplazamiento2.toInt()
-        )
-        CirculoDecorativo(
-            tamano = 60,
-            alfa = 0.1f,
-            offsetX = 50,
-            offsetY = 600 + desplazamiento1.toInt()
-        )
-        CirculoDecorativo(
-            tamano = 100,
-            alfa = 0.07f,
-            offsetX = 260,
-            offsetY = 500 + desplazamiento2.toInt()
-        )
+        val anchoTotal = constraints.maxWidth.toFloat()
+        val altoTotal = constraints.maxHeight.toFloat()
+
+        // ── Forma de chevron blanco en la parte superior ──
+        Canvas(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            val chevronAlto = altoTotal * 0.35f
+            val path = Path().apply {
+                moveTo(0f, 0f)
+                lineTo(anchoTotal, 0f)
+                lineTo(anchoTotal, chevronAlto * 0.65f)
+                lineTo(anchoTotal / 2f, chevronAlto)
+                lineTo(0f, chevronAlto * 0.65f)
+                close()
+            }
+            drawPath(path, Color.White, style = Fill)
+        }
 
         // ── Contenido principal ──
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(32.dp),
+                .systemBarsPadding(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.weight(1f))
-
-            // ── Logo con animación ──
-            Surface(
+            // ── Zona del logo (dentro del chevron blanco) ──
+            Column(
                 modifier = Modifier
-                    .size(140.dp)
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.30f)
                     .alpha(alfaLogo),
-                shape = MaterialTheme.shapes.extraLarge,
-                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.15f)
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
-                Icon(
-                    imageVector = Icons.Rounded.Pets,
-                    contentDescription = "Logo Huellitas",
-                    modifier = Modifier
-                        .padding(28.dp)
-                        .fillMaxSize(),
-                    tint = MaterialTheme.colorScheme.surface
+                // ── Logo oficial ──
+                Image(
+                    painter = painterResource(id = R.drawable.logo_huellitas),
+                    contentDescription = "Logo Huellitas a Salvo",
+                    modifier = Modifier.size(160.dp)
                 )
             }
 
-            Spacer(modifier = Modifier.height(40.dp))
-
-            // ── Título ──
-            Text(
-                text = "Huellitas",
-                style = MaterialTheme.typography.displayMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.surface,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.alpha(alfaTitulo)
-            )
-
             Spacer(modifier = Modifier.height(16.dp))
 
-            // ── Eslogan ──
+            // ── Collage de 3 imágenes de mascotas ──
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(280.dp)
+                    .padding(horizontal = 24.dp)
+                    .alpha(alfaImagenes),
+                contentAlignment = Alignment.Center
+            ) {
+                // Fila superior: 2 imágenes lado a lado
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.TopCenter),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally)
+                ) {
+                    // Imagen 1: Perrito (izquierda)
+                    Image(
+                        painter = painterResource(id = R.drawable.pet_dog_1),
+                        contentDescription = "Perrito callejero",
+                        modifier = Modifier
+                            .size(150.dp)
+                            .clip(RoundedCornerShape(20.dp)),
+                        contentScale = ContentScale.Crop
+                    )
+
+                    // Imagen 2: Perrito (derecha)
+                    Image(
+                        painter = painterResource(id = R.drawable.pet_dog_1),
+                        contentDescription = "Perrito callejero",
+                        modifier = Modifier
+                            .size(150.dp)
+                            .clip(RoundedCornerShape(20.dp)),
+                        contentScale = ContentScale.Crop
+                    )
+                    // Gatito oculto temporalmente:
+                    // Image(
+                    //     painter = painterResource(id = R.drawable.pet_cat_1),
+                    //     contentDescription = "Gatito callejero",
+                    //     modifier = Modifier
+                    //         .size(150.dp)
+                    //         .clip(RoundedCornerShape(20.dp)),
+                    //     contentScale = ContentScale.Crop
+                    // )
+                }
+
+                // Imagen 3: Cachorro (centrado abajo, superpuesto)
+                Image(
+                    painter = painterResource(id = R.drawable.pet_puppy_1),
+                    contentDescription = "Cachorro necesitado",
+                    modifier = Modifier
+                        .size(160.dp)
+                        .align(Alignment.BottomCenter)
+                        .offset(y = 20.dp)
+                        .clip(RoundedCornerShape(20.dp)),
+                    contentScale = ContentScale.Crop
+                )
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // ── Texto descriptivo ──
             Text(
-                text = "Cada huella cuenta.\nAyuda a encontrar hogar a quienes\nmás lo necesitan.",
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
+                text = "peluditos que\nnecesitan de tu\nayuda",
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Medium,
+                color = Color.White.copy(alpha = 0.95f),
                 textAlign = TextAlign.Center,
-                modifier = Modifier.alpha(alfaSubtitulo)
+                lineHeight = 38.sp,
+                modifier = Modifier
+                    .padding(horizontal = 40.dp)
+                    .alpha(alfaTexto)
             )
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // ── Indicador de página ──
-            IndicadorPagina(
-                totalPaginas = 2,
-                paginaActual = 0,
-                colorActivo = MaterialTheme.colorScheme.surface,
-                colorInactivo = MaterialTheme.colorScheme.surface.copy(alpha = 0.4f)
-            )
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // ── Botón de acción ──
+            // ── Botón "iniciar" ──
             Button(
                 onClick = alSiguiente,
                 modifier = Modifier
                     .fillMaxWidth()
+                    .padding(horizontal = 48.dp)
                     .height(56.dp)
                     .alpha(alfaBoton),
-                shape = MaterialTheme.shapes.large,
+                shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    contentColor = PrimaryLight
+                    containerColor = Color.White,
+                    contentColor = PurpleText
+                ),
+                elevation = ButtonDefaults.buttonElevation(
+                    defaultElevation = 4.dp
                 )
             ) {
                 Text(
-                    text = "Comenzar",
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.SemiBold
+                    text = "iniciar",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp
                 )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(40.dp))
         }
     }
-}
-
-/**
- * Círculo decorativo translúcido flotante para el fondo.
- * Aporta profundidad y dinamismo visual a la pantalla.
- */
-@Composable
-private fun CirculoDecorativo(
-    tamano: Int,
-    alfa: Float,
-    offsetX: Int,
-    offsetY: Int
-) {
-    Box(
-        modifier = Modifier
-            .offset { IntOffset(offsetX, offsetY) }
-            .size(tamano.dp)
-            .alpha(alfa)
-            .background(
-                color = MaterialTheme.colorScheme.surface,
-                shape = CircleShape
-            )
-    )
 }
 
 @Preview(showBackground = true, showSystemUi = true)

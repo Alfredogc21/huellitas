@@ -25,7 +25,7 @@ android {
         // │ CAMBIA "tudominio.com" POR TU DOMINIO REAL DE HOSTGATOR        │
         // │ Ejemplo: "https://midominio.com/huellitas/"                    │
         // └─────────────────────────────────────────────────────────────────┘
-        buildConfigField("String", "BASE_URL", "\"https://webculmapp.com/huellitas/\"")
+        buildConfigField("String", "BASE_URL", "\"https://alfreweb.com/huellitas/\"")
     }
 
     buildTypes {

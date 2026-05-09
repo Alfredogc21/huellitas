@@ -71,6 +71,29 @@ class AnimalRepository {
     }
 
     /**
+     * Obtiene animales disponibles para adopción (estado=5 Rehabilitado, tipo=1 Perro).
+     */
+    suspend fun obtenerAnimalesAdopcion(pagina: Int = 1, limite: Int = 20): Resultado<List<Animal>> {
+        return try {
+            // Estado 5 = Rehabilitado (listos para adopción), tipo 1 = Perro
+            val response = api.listarAnimalesPorTipo(
+                idTipo = 1,
+                pagina = pagina,
+                limite = limite,
+                estado = 5
+            )
+            if (response.isSuccessful && response.body()?.status == true) {
+                val lista = response.body()!!.data?.map { it.aModelo() } ?: emptyList()
+                Resultado.Exito(lista)
+            } else {
+                Resultado.Error(response.body()?.message ?: "Error al obtener animales para adopción")
+            }
+        } catch (e: Exception) {
+            Resultado.Error("Sin conexión: ${e.localizedMessage}")
+        }
+    }
+
+    /**
      * Registra un nuevo animal en el servidor.
      */
     suspend fun crearAnimal(
@@ -109,7 +132,7 @@ class AnimalRepository {
      * Soporta tanto URIs content:// (galería) como file:// (cámara interna CameraX).
      * Devuelve la URL pública de la imagen.
      */
-    suspend fun subirImagen(context: Context, uri: Uri): Resultado<String> {
+    suspend fun subirImagen(context: Context, uri: Uri, tipo: String? = null): Resultado<String> {
         return try {
             val contentResolver = context.contentResolver
 
@@ -133,7 +156,9 @@ class AnimalRepository {
                 requestBody
             )
 
-            val response = api.subirImagen(multipart)
+            val tipoPart = tipo?.toRequestBody("text/plain".toMediaTypeOrNull())
+
+            val response = api.subirImagen(multipart, tipoPart)
             if (response.isSuccessful && response.body()?.status == true) {
                 val url = response.body()!!.data?.get("imagen_url")
                     ?: return Resultado.Error("No se recibió la URL de la imagen.")

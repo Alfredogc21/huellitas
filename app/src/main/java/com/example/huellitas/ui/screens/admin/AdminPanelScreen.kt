@@ -1,6 +1,7 @@
 package com.example.huellitas.ui.screens.admin
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,12 +15,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ExitToApp
 import androidx.compose.material.icons.outlined.Description
-import androidx.compose.material.icons.outlined.Pets
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -41,12 +42,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.huellitas.R
 import com.example.huellitas.ui.theme.GradientStart
 import com.example.huellitas.ui.theme.HuellitasTheme
 import com.example.huellitas.ui.theme.PurpleDark
@@ -62,7 +67,11 @@ import com.example.huellitas.ui.theme.PurpleDark
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PantallaAdminPanel(alCerrarSesion: () -> Unit) {
+fun PantallaAdminPanel(
+    alCerrarSesion: () -> Unit,
+    alNavegarAVeterinarios: () -> Unit = {},
+    alNavegarAAdopciones: () -> Unit = {}
+) {
     var filtroSeleccionado by remember { mutableStateOf("Todos") }
 
     Scaffold(
@@ -83,20 +92,15 @@ fun PantallaAdminPanel(alCerrarSesion: () -> Unit) {
                     }
                 },
                 navigationIcon = {
-                    // Logo placeholder
-                    Box(
+                    androidx.compose.foundation.Image(
+                        painter = painterResource(id = R.drawable.logo_huellitas),
+                        contentDescription = "Logo Huellitas",
                         modifier = Modifier
                             .padding(start = 8.dp)
-                            .size(32.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Pets,
-                            contentDescription = null,
-                            tint = Color.White,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
+                            .size(36.dp)
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop
+                    )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = GradientStart,
@@ -201,14 +205,16 @@ fun PantallaAdminPanel(alCerrarSesion: () -> Unit) {
                     titulo = "Veterinarios",
                     descripcion = "Gestiona profesionales médicos",
                     colorFondo = Color(0xFF00897B),
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    onClick = alNavegarAVeterinarios
                 )
                 TarjetaSeccion(
                     emoji = "\uD83D\uDC95",
                     titulo = "Adopciones",
                     descripcion = "Panel de perros en adopción",
                     colorFondo = Color(0xFFD81B60),
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    onClick = alNavegarAAdopciones
                 )
             }
 
@@ -295,10 +301,13 @@ private fun TarjetaSeccion(
     titulo: String,
     descripcion: String,
     colorFondo: Color,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {}
 ) {
     Surface(
-        modifier = modifier.height(80.dp),
+        modifier = modifier
+            .height(80.dp)
+            .clickable(onClick = onClick),
         shape = RoundedCornerShape(16.dp),
         color = colorFondo
     ) {

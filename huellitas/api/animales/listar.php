@@ -24,14 +24,15 @@ try {
     $pagina = isset($_GET['pagina']) ? max(1, (int) $_GET['pagina']) : 1;
     $desplazamiento = ($pagina - 1) * $limite;
 
-    $idTipo = isset($_GET['tipo']) ? (int) $_GET['tipo'] : null;
+    $idTipo   = isset($_GET['tipo'])   ? (int) $_GET['tipo']   : null;
+    $idEstado = isset($_GET['estado']) ? (int) $_GET['estado'] : null;
 
     if ($idTipo !== null && $idTipo > 0) {
-        $animales = $animal->obtenerPorTipo($idTipo, $limite, $desplazamiento);
+        $animales = $animal->obtenerPorTipo($idTipo, $limite, $desplazamiento, $idEstado);
     } else {
-        $orden = $_GET['orden'] ?? 'fecha_registro';
+        $orden     = $_GET['orden']     ?? 'fecha_registro';
         $direccion = $_GET['direccion'] ?? 'DESC';
-        $animales = $animal->obtenerTodos($orden, $direccion, $limite, $desplazamiento);
+        $animales  = $animal->obtenerTodos($orden, $direccion, $limite, $desplazamiento, $idEstado);
     }
 
     Response::success($animales, 'Animales obtenidos correctamente');

@@ -5,6 +5,11 @@
  * Método: POST (multipart/form-data)
  * URL: /api/animales/subir_imagen.php
  * 
+ * Campos (form-data):
+ *   - imagen: archivo de imagen (jpg, jpeg, png, webp) máx 5MB
+ *   - id_animal: (opcional) ID del animal si ya existe
+ * 
+ * Responde con la URL pública de la imagen subida.
  */
 
 declare(strict_types=1);
@@ -73,8 +78,17 @@ $extensiones = [
 $extension = $extensiones[$tipoReal];
 $nombreArchivo = uniqid('animal_', true) . '.' . $extension;
 
-// Crear carpeta uploads si no existe
-$carpetaDestino = __DIR__ . '/../../uploads/';
+// Determinar subcarpeta según el tipo de foto
+$tipoFoto = isset($_POST['tipo']) ? trim($_POST['tipo']) : '';
+$subcarpeta = match ($tipoFoto) {
+    'rehabilitado' => 'rehabilitado/',
+    'tratamiento'  => 'tratamientos/',
+    default        => '',
+};
+
+// Crear carpeta destino si no existe
+$carpetaBase    = __DIR__ . '/../../uploads/';
+$carpetaDestino = $carpetaBase . $subcarpeta;
 if (!is_dir($carpetaDestino)) {
     mkdir($carpetaDestino, 0755, true);
 }
@@ -92,7 +106,7 @@ $host = $_SERVER['HTTP_HOST'];
 // Detectar la ruta base dinámicamente
 $scriptDir = dirname($_SERVER['SCRIPT_NAME']); // /huellitas/api/animales
 $baseDir = dirname(dirname($scriptDir));        // /huellitas
-$urlImagen = $protocolo . '://' . $host . $baseDir . '/uploads/' . $nombreArchivo;
+$urlImagen = $protocolo . '://' . $host . $baseDir . '/uploads/' . $subcarpeta . $nombreArchivo;
 
 // ── Si se envió id_animal, registrar en la BD ──
 $idAnimal = isset($_POST['id_animal']) ? (int) $_POST['id_animal'] : null;

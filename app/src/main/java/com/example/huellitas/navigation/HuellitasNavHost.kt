@@ -10,20 +10,28 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.example.huellitas.ui.screens.admin.PantallaAdminPanel
+import com.example.huellitas.ui.screens.admin.PantallaAgregarVeterinario
 import com.example.huellitas.ui.screens.admin.PantallaLoginAdmin
+import com.example.huellitas.ui.screens.admin.PantallaVeterinariosAdmin
 import com.example.huellitas.ui.screens.admin.PantallaRegistroUsuario
 import com.example.huellitas.ui.screens.admin.PantallaTutorialAdmin
+import com.example.huellitas.ui.screens.adopcion.PantallaAdopcion
 import com.example.huellitas.ui.screens.home.PantallaListaAnimales
 import com.example.huellitas.ui.screens.onboarding.PantallaBienvenida
 import com.example.huellitas.ui.screens.onboarding.PantallaIntroduccion
 import com.example.huellitas.ui.screens.onboarding.PantallaTutorial
 import com.example.huellitas.ui.screens.registration.PantallaRegistroAnimal
 import com.example.huellitas.ui.screens.splash.PantallaCarga
+import com.example.huellitas.ui.screens.veterinario.PantallaRegistrarPacienteVet
+import com.example.huellitas.ui.screens.veterinario.PantallaVeterinario
 import com.example.huellitas.viewmodel.AnimalListViewModel
 import com.example.huellitas.viewmodel.AuthViewModel
+import com.example.huellitas.viewmodel.VeterinarioViewModel
 
 private const val DURACION_ANIMACION = 400
 
@@ -53,6 +61,9 @@ fun NavHostHuellitas(
 
     // ViewModel compartido para autenticación (login y registro)
     val authViewModel: AuthViewModel = viewModel()
+
+    // ViewModel compartido de veterinarios (lista + agregar comparten misma instancia)
+    val vetListViewModel: VeterinarioViewModel = viewModel()
 
     // Estado para controlar si ya se vio el tutorial de admin
     val tutorialAdminVisto = rememberSaveable { mutableStateOf(false) }
@@ -136,6 +147,7 @@ fun NavHostHuellitas(
                 alNavegarARegistro = { controladorNav.navigate(Rutas.REGISTRAR_ANIMAL) },
                 alNavegarATutorial = { controladorNav.navigate(Rutas.TUTORIAL) },
                 alNavegarAAdmin = { controladorNav.navigate(Rutas.ADMIN_LOGIN) },
+                alNavegarAAdopcion = { controladorNav.navigate(Rutas.ADOPCION) },
                 viewModel = listViewModel
             )
         }
@@ -164,16 +176,23 @@ fun NavHostHuellitas(
 
         composable(Rutas.ADMIN_LOGIN) {
             PantallaLoginAdmin(
-                alIniciarSesion = {
-                    if (!tutorialAdminVisto.value) {
-                        // Primera vez: mostrar tutorial
-                        controladorNav.navigate(Rutas.ADMIN_TUTORIAL) {
+                alIniciarSesion = { rolId, userId ->
+                    // rolId 1 = Admin, 2 = Veterinario
+                    if (rolId == 2) {
+                        // Veterinario: ir directo al panel vet con su ID
+                        controladorNav.navigate(Rutas.vetPanel(userId)) {
                             popUpTo(Rutas.ADMIN_LOGIN) { inclusive = true }
                         }
                     } else {
-                        // Ya vio el tutorial: ir directo al panel
-                        controladorNav.navigate(Rutas.ADMIN_PANEL) {
-                            popUpTo(Rutas.ADMIN_LOGIN) { inclusive = true }
+                        // Admin: mostrar tutorial si es la primera vez
+                        if (!tutorialAdminVisto.value) {
+                            controladorNav.navigate(Rutas.ADMIN_TUTORIAL) {
+                                popUpTo(Rutas.ADMIN_LOGIN) { inclusive = true }
+                            }
+                        } else {
+                            controladorNav.navigate(Rutas.ADMIN_PANEL) {
+                                popUpTo(Rutas.ADMIN_LOGIN) { inclusive = true }
+                            }
                         }
                     }
                 },
@@ -226,7 +245,60 @@ fun NavHostHuellitas(
                     controladorNav.navigate(Rutas.INICIO) {
                         popUpTo(Rutas.ADMIN_PANEL) { inclusive = true }
                     }
+                },
+                alNavegarAVeterinarios = { controladorNav.navigate(Rutas.ADMIN_VETERINARIOS) },
+                alNavegarAAdopciones = { controladorNav.navigate(Rutas.ADOPCION) }
+            )
+        }
+
+        composable(Rutas.ADMIN_VETERINARIOS) {
+            PantallaVeterinariosAdmin(
+                alVolver = { controladorNav.popBackStack() },
+                alAgregarVeterinario = { controladorNav.navigate(Rutas.ADMIN_AGREGAR_VET) },
+                viewModel = vetListViewModel
+            )
+        }
+
+        composable(Rutas.ADMIN_AGREGAR_VET) {
+            PantallaAgregarVeterinario(
+                alVolver = { controladorNav.popBackStack() },
+                viewModel = vetListViewModel
+            )
+        }
+
+        composable(
+            route = Rutas.VET_PANEL,
+            arguments = listOf(navArgument("vetId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val vetId = backStackEntry.arguments?.getInt("vetId") ?: 0
+            PantallaVeterinario(
+                vetId = vetId,
+                alCerrarSesion = {
+                    controladorNav.navigate(Rutas.INICIO) {
+                        popUpTo(Rutas.VET_PANEL) { inclusive = true }
+                    }
+                },
+                alRegistrarAnimal = { id ->
+                    controladorNav.navigate(Rutas.vetRegistrarPaciente(id))
                 }
+            )
+        }
+
+        composable(
+            route = Rutas.VET_REGISTRAR_PACIENTE,
+            arguments = listOf(navArgument("vetId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val vetId = backStackEntry.arguments?.getInt("vetId") ?: 0
+            PantallaRegistrarPacienteVet(
+                vetId = vetId,
+                alVolver = { controladorNav.popBackStack() },
+                alRegistrado = { controladorNav.popBackStack() }
+            )
+        }
+
+        composable(Rutas.ADOPCION) {
+            PantallaAdopcion(
+                alVolver = { controladorNav.popBackStack() }
             )
         }
     }

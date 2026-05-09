@@ -18,5 +18,8 @@ data class AnimalDto(
     @SerializedName("id_estado")     val idEstado: Int,
     @SerializedName("estado")        val estado: String,
     @SerializedName("fecha_registro") val fechaRegistro: String,
-    @SerializedName("imagen_url")    val imagenUrl: String?
+    @SerializedName("imagen_url")    val imagenUrl: String?,
+    @SerializedName("id_veterinario") val idVeterinario: Int? = null,
+    @SerializedName("foto_ingreso")   val fotoIngreso: String? = null,
+    @SerializedName("foto_rehabilitacion") val fotoRehabilitacion: String? = null
 )

@@ -15,9 +15,11 @@ class Usuario
 
     public ?int $id = null;
     public string $nombre;
-    public string $apellidos;
+    public string $apellidos = '';
     public string $correo;
     public string $password;
+    public ?string $telefono = null;
+    public ?string $especializacion = null;
     public int $rol_id = 1;
 
     public function __construct()
@@ -27,13 +29,10 @@ class Usuario
 
     /**
      * Buscar usuario por correo electrónico.
-     *
-     * @param string $correo Correo del usuario.
-     * @return array|false Datos del usuario o false si no existe.
      */
     public function obtenerPorCorreo(string $correo): array|false
     {
-        $query = "SELECT u.id, u.nombre, u.apellidos, u.correo, u.password,
+        $query = "SELECT u.id, u.nombre, u.apellidos, u.correo, u.telefono, u.especializacion, u.password,
                          u.rol_id, r.nombre AS rol, u.created_at, u.updated_at
                   FROM {$this->table} u
                   INNER JOIN roles r ON u.rol_id = r.id
@@ -48,20 +47,37 @@ class Usuario
     }
 
     /**
+     * Listar todos los veterinarios (rol_id = 2).
+     */
+    public function listarVeterinarios(): array
+    {
+        $query = "SELECT u.id, u.nombre, u.apellidos, u.correo, u.telefono, u.especializacion,
+                         u.rol_id, r.nombre AS rol, u.created_at, u.updated_at
+                  FROM {$this->table} u
+                  INNER JOIN roles r ON u.rol_id = r.id
+                  WHERE u.rol_id = 2
+                  ORDER BY u.created_at DESC";
+
+        $stmt = $this->db->prepare($query);
+        $stmt->execute();
+
+        return $stmt->fetchAll();
+    }
+
+    /**
      * Registrar un nuevo usuario.
-     *
-     * @return int ID del usuario creado.
-     * @throws PDOException Si hay error de base de datos.
      */
     public function crear(): int
     {
-        $query = "INSERT INTO {$this->table} (nombre, apellidos, correo, password, rol_id)
-                  VALUES (:nombre, :apellidos, :correo, :password, :rol_id)";
+        $query = "INSERT INTO {$this->table} (nombre, apellidos, correo, telefono, especializacion, password, rol_id)
+                  VALUES (:nombre, :apellidos, :correo, :telefono, :especializacion, :password, :rol_id)";
 
         $stmt = $this->db->prepare($query);
         $stmt->bindValue(':nombre', $this->nombre, PDO::PARAM_STR);
         $stmt->bindValue(':apellidos', $this->apellidos, PDO::PARAM_STR);
         $stmt->bindValue(':correo', $this->correo, PDO::PARAM_STR);
+        $stmt->bindValue(':telefono', $this->telefono);
+        $stmt->bindValue(':especializacion', $this->especializacion);
         $stmt->bindValue(':password', $this->password, PDO::PARAM_STR);
         $stmt->bindValue(':rol_id', $this->rol_id, PDO::PARAM_INT);
         $stmt->execute();
@@ -71,9 +87,6 @@ class Usuario
 
     /**
      * Verificar si un correo ya está registrado.
-     *
-     * @param string $correo Correo a verificar.
-     * @return bool True si el correo ya existe.
      */
     public function existeCorreo(string $correo): bool
     {

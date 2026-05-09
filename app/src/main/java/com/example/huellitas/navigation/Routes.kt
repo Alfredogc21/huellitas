@@ -23,4 +23,18 @@ object Rutas {
     const val ADMIN_REGISTRO = "admin_registro"
     const val ADMIN_TUTORIAL = "admin_tutorial"
     const val ADMIN_PANEL = "admin_panel"
+
+    // ── Panel Veterinario ──
+    const val VET_PANEL = "vet_panel/{vetId}"
+    fun vetPanel(vetId: Int) = "vet_panel/$vetId"
+
+    const val VET_REGISTRAR_PACIENTE = "vet_registrar_paciente/{vetId}"
+    fun vetRegistrarPaciente(vetId: Int) = "vet_registrar_paciente/$vetId"
+
+    // ── Adopción ──
+    const val ADOPCION = "adopcion"
+
+    // ── Gestión de Veterinarios (admin) ──
+    const val ADMIN_VETERINARIOS = "admin_veterinarios"
+    const val ADMIN_AGREGAR_VET = "admin_agregar_vet"
 }

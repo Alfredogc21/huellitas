@@ -3,7 +3,9 @@ package com.example.huellitas.ui.screens.home
 import android.text.format.DateFormat
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,6 +26,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Pets
 import androidx.compose.material.icons.outlined.Refresh
@@ -100,6 +103,7 @@ fun PantallaListaAnimales(
     alNavegarARegistro: () -> Unit,
     alNavegarATutorial: () -> Unit = {},
     alNavegarAAdmin: () -> Unit = {},
+    alNavegarAAdopcion: () -> Unit = {},
     viewModel: AnimalListViewModel = viewModel()
 ) {
     val estadoActual by viewModel.estado.collectAsState()
@@ -221,6 +225,9 @@ fun PantallaListaAnimales(
                 .background(Color(0xFFF5F0FA))
                 .padding(paddingInterno)
         ) {
+            // ── Banner de adopción ──
+            BannerAdopcion(alHacerClic = alNavegarAAdopcion)
+
             // ── Chips de tipo de animal (siempre fijos arriba) ──
             FilaTipoAnimal(
                 tipoSeleccionado = tipoSeleccionado,
@@ -514,6 +521,58 @@ private fun EstadoVacio() {
 private fun PantallaListaAnimalesPreview() {
     HuellitasTheme {
         PantallaListaAnimales(alNavegarARegistro = {})
+    }
+}
+
+/**
+ * Banner promocional de adopción que aparece en el feed principal.
+ * Fondo verde degradado con ícono de huella y flecha al lado derecho.
+ */
+@Composable
+fun BannerAdopcion(alHacerClic: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .background(
+                brush = Brush.horizontalGradient(
+                    colors = listOf(Color(0xFF2E7D32), Color(0xFF43A047))
+                )
+            )
+            .clickable { alHacerClic() }
+            .padding(horizontal = 16.dp, vertical = 14.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Ícono de huella
+            Text(
+                text = "\uD83D\uDC9A",
+                style = MaterialTheme.typography.headlineSmall
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "¡Adopta un Perrito Rescatado!",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+                Text(
+                    text = "Haz clic para ver los perritos disponibles",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.White.copy(alpha = 0.9f)
+                )
+            }
+            Icon(
+                imageVector = Icons.AutoMirrored.Outlined.ArrowForward,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(20.dp)
+            )
+        }
     }
 }
 

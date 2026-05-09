@@ -55,16 +55,16 @@ import com.example.huellitas.viewmodel.EstadoAuth
 /**
  * Pantalla de inicio de sesión del panel de administración.
  *
- * Valida credenciales contra el backend PHP.
+ * Valida credenciales contra el backend PHP y retorna el rol del usuario.
  *
- * @param alIniciarSesion Callback al autenticarse correctamente
+ * @param alIniciarSesion Callback al autenticarse: recibe el rolId (1=Admin, 2=Veterinario)
  * @param alVolver Callback para regresar al feed principal
  * @param alIrARegistro Callback para navegar a la pantalla de registro
  * @param authViewModel ViewModel compartido de autenticación
  */
 @Composable
 fun PantallaLoginAdmin(
-    alIniciarSesion: () -> Unit,
+    alIniciarSesion: (rolId: Int, userId: Int) -> Unit,
     alVolver: () -> Unit,
     alIrARegistro: () -> Unit = {},
     authViewModel: AuthViewModel
@@ -97,8 +97,9 @@ fun PantallaLoginAdmin(
     LaunchedEffect(estadoAuth) {
         when (estadoAuth) {
             is EstadoAuth.Exito -> {
+                val usuario = (estadoAuth as EstadoAuth.Exito).usuario
                 authViewModel.resetearEstado()
-                alIniciarSesion()
+                alIniciarSesion(usuario.rolId, usuario.id)
             }
             is EstadoAuth.Error -> {
                 mensajeError = (estadoAuth as EstadoAuth.Error).mensaje
@@ -309,7 +310,7 @@ fun PantallaLoginAdmin(
 private fun PantallaLoginAdminPreview() {
     HuellitasTheme {
         PantallaLoginAdmin(
-            alIniciarSesion = {},
+            alIniciarSesion = { _, _ -> },
             alVolver = {},
             alIrARegistro = {},
             authViewModel = AuthViewModel()

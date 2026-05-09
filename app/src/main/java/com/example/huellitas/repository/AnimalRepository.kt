@@ -71,16 +71,17 @@ class AnimalRepository {
     }
 
     /**
-     * Obtiene animales disponibles para adopción (estado=5 Rehabilitado, tipo=1 Perro).
+     * Obtiene animales disponibles para adopción pública (estado=6 Para adoptar, tipo=1 Perro).
+     * Solo aparecen animales que el admin aprobó explícitamente.
      */
     suspend fun obtenerAnimalesAdopcion(pagina: Int = 1, limite: Int = 20): Resultado<List<Animal>> {
         return try {
-            // Estado 5 = Rehabilitado (listos para adopción), tipo 1 = Perro
+            // Estado 6 = Para adoptar (aprobado por admin), tipo 1 = Perro
             val response = api.listarAnimalesPorTipo(
                 idTipo = 1,
                 pagina = pagina,
                 limite = limite,
-                estado = 5
+                estado = 6
             )
             if (response.isSuccessful && response.body()?.status == true) {
                 val lista = response.body()!!.data?.map { it.aModelo() } ?: emptyList()

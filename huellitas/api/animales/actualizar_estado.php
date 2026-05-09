@@ -5,7 +5,7 @@
  * Método: POST
  * URL: /api/animales/actualizar_estado.php
  * Body: { "id": X, "id_estado": Y }
- * Estados: 1=Activo, 2=Adoptado, 3=Inactivo, 4=En progreso, 5=Rehabilitado
+ * Estados: 1=Activo, 2=Adoptado, 3=Inactivo, 4=En progreso, 5=Rehabilitado, 6=Para adoptar
  */
 
 declare(strict_types=1);
@@ -42,9 +42,9 @@ if ($id <= 0) {
     Response::error('El campo "id" es obligatorio y debe ser un número válido.');
 }
 
-$estadosPermitidos = [1, 2, 3, 4, 5];
+$estadosPermitidos = [1, 2, 3, 4, 5, 6];
 if (!in_array($idEstado, $estadosPermitidos, true)) {
-    Response::error('El campo "id_estado" debe ser 1, 2, 3, 4 o 5.');
+    Response::error('El campo "id_estado" debe ser 1, 2, 3, 4, 5 o 6.');
 }
 
 try {

@@ -19,7 +19,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Pets
 import androidx.compose.material.icons.outlined.Search
@@ -277,7 +276,19 @@ private fun TarjetaAdopcion(animal: Animal) {
                         color = PurpleDark,
                         modifier = Modifier.weight(1f)
                     )
-                    Icon(Icons.Outlined.Favorite, contentDescription = null, tint = Color(0xFFE91E63), modifier = Modifier.size(16.dp))
+                    // Badge "Adoptame" — solo aparece porque el admin aprobó este animal (estado=6)
+                    Surface(
+                        shape = RoundedCornerShape(20.dp),
+                        color = Color(0xFFE91E63).copy(alpha = 0.9f)
+                    ) {
+                        Text(
+                            text = "💚 Adoptame",
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color.White,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
                 }
 
                 if (animal.raza.isNotBlank()) {

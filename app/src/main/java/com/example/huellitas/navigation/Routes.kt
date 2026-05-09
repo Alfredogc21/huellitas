@@ -37,4 +37,7 @@ object Rutas {
     // ── Gestión de Veterinarios (admin) ──
     const val ADMIN_VETERINARIOS = "admin_veterinarios"
     const val ADMIN_AGREGAR_VET = "admin_agregar_vet"
+
+    // ── Gestión de Adopciones (admin) ──
+    const val ADMIN_ADOPCIONES = "admin_adopciones"
 }

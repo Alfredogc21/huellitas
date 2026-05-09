@@ -1,6 +1,7 @@
 package com.example.huellitas.network
 
 import com.example.huellitas.network.dto.ActualizarEstadoRequest
+import com.example.huellitas.network.dto.RehabilitadosAdminDto
 import com.example.huellitas.network.dto.AnimalDto
 import com.example.huellitas.network.dto.ApiResponse
 import com.example.huellitas.network.dto.AsignarVetRequest
@@ -105,4 +106,8 @@ interface ApiService {
     suspend fun asignarVet(
         @Body request: AsignarVetRequest
     ): Response<ApiResponse<AnimalDto>>
+
+    // Trae dos listas: rehabilitados (estado=5) y para_adoptar (estado=6)
+    @GET("api/animales/listar_rehabilitados_admin.php")
+    suspend fun listarRehabilitadosAdmin(): Response<ApiResponse<RehabilitadosAdminDto>>
 }

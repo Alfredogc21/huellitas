@@ -342,7 +342,7 @@ class Animal
      */
     public function actualizarEstado(int $id, int $idEstado, ?string $fotoRehabilitacion = null): bool
     {
-        $estadosPermitidos = [1, 2, 3, 4, 5];
+$estadosPermitidos = [1, 2, 3, 4, 5, 6];
         if (!in_array($idEstado, $estadosPermitidos, true)) {
             return false;
         }

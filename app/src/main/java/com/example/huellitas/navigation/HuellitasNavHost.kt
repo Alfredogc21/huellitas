@@ -14,6 +14,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.huellitas.ui.screens.admin.PantallaAdopcionAdmin
 import com.example.huellitas.ui.screens.admin.PantallaAdminPanel
 import com.example.huellitas.ui.screens.admin.PantallaAgregarVeterinario
 import com.example.huellitas.ui.screens.admin.PantallaLoginAdmin
@@ -247,7 +248,7 @@ fun NavHostHuellitas(
                     }
                 },
                 alNavegarAVeterinarios = { controladorNav.navigate(Rutas.ADMIN_VETERINARIOS) },
-                alNavegarAAdopciones = { controladorNav.navigate(Rutas.ADOPCION) }
+                alNavegarAAdopciones = { controladorNav.navigate(Rutas.ADMIN_ADOPCIONES) }
             )
         }
 
@@ -298,6 +299,12 @@ fun NavHostHuellitas(
 
         composable(Rutas.ADOPCION) {
             PantallaAdopcion(
+                alVolver = { controladorNav.popBackStack() }
+            )
+        }
+
+        composable(Rutas.ADMIN_ADOPCIONES) {
+            PantallaAdopcionAdmin(
                 alVolver = { controladorNav.popBackStack() }
             )
         }

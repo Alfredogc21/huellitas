@@ -3,6 +3,7 @@
 /**
  * API Endpoint: Obtener un animal por ID
  * Método: GET
+ * URL: /api/animales/obtener.php?id={id}
  */
 
 declare(strict_types=1);

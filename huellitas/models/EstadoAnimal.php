@@ -8,11 +8,13 @@ require_once __DIR__ . '/../config/Database.php';
  * Clase EstadoAnimal - Modelo para la tabla estados_animal.
  * Encapsula las operaciones de lectura del catálogo de estados.
  */
-class EstadoAnimal {
+class EstadoAnimal
+{
     private PDO $db;
     private string $table = 'estados_animal';
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->db = Database::getInstance()->getConnection();
     }
 
@@ -21,7 +23,8 @@ class EstadoAnimal {
      * 
      * @return array Lista de estados.
      */
-    public function obtenerTodos(): array {
+    public function obtenerTodos(): array
+    {
         $query = "SELECT id, nombre, descripcion FROM {$this->table} ORDER BY id ASC";
         $stmt = $this->db->query($query);
 
@@ -34,7 +37,8 @@ class EstadoAnimal {
      * @param int $id ID del estado.
      * @return array|false Datos del estado o false si no existe.
      */
-    public function obtenerPorId(int $id): array|false {
+    public function obtenerPorId(int $id): array|false
+    {
         $query = "SELECT id, nombre, descripcion FROM {$this->table} WHERE id = :id";
         $stmt = $this->db->prepare($query);
         $stmt->bindValue(':id', $id, PDO::PARAM_INT);

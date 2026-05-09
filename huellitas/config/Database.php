@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 /**
  * Clase Database - Conexión a la base de datos usando PDO (Singleton)
+ * 
  * Lee las credenciales desde config/env.php para que solo
+ * se cambie un archivo al migrar de XAMPP a HostGator.
  */
 class Database
 {
@@ -15,7 +17,8 @@ class Database
      * Constructor privado para evitar instanciación directa.
      * Configura PDO con manejo de errores por excepciones.
      */
-    private function __construct() {
+    private function __construct()
+    {
         $env = require __DIR__ . '/env.php';
 
         $dsn = sprintf(
@@ -48,22 +51,27 @@ class Database
     private function __clone() {}
 
     /** Evitar deserialización del Singleton */
-    public function __wakeup() {
+    public function __wakeup()
+    {
         throw new \Exception('No se puede deserializar un Singleton.');
     }
 
-    
-    // Obtener la instancia única de Database.
-     
-    public static function getInstance(): self {
+    /**
+     * Obtener la instancia única de Database.
+     */
+    public static function getInstance(): self
+    {
         if (self::$instance === null) {
             self::$instance = new self();
         }
         return self::$instance;
     }
 
-    /** Obtener el objeto PDO de conexión. */
-    public function getConnection(): PDO {
+    /**
+     * Obtener el objeto PDO de conexión.
+     */
+    public function getConnection(): PDO
+    {
         return $this->connection;
     }
 }

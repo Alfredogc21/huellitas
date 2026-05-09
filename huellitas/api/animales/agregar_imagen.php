@@ -5,6 +5,12 @@
  * Método: POST
  * URL: /api/animales/agregar_imagen.php
  * 
+ * Body (JSON):
+ * {
+ *   "id_animal": 1,                    (obligatorio)
+ *   "imagen_url": "https://...",        (obligatorio)
+ *   "es_principal": false               (opcional, default: false)
+ * }
  */
 
 declare(strict_types=1);

@@ -1,8 +1,17 @@
 <?php
 
-//  API Endpoint: Listar todos los animales
-//  Método: GET
-//  URL: /api/animales/listar.php
+/**
+ * API Endpoint: Listar todos los animales
+ * Método: GET
+ * URL: /api/animales/listar.php
+ *
+ * Parámetros opcionales (query string):
+ *   - orden: 'fecha_registro' | 'nombre' | 'id' (default: fecha_registro)
+ *   - direccion: 'ASC' | 'DESC' (default: DESC)
+ *   - tipo: ID del tipo de animal para filtrar
+ *   - pagina: Número de página (default: 1)
+ *   - limite: Cantidad de resultados por página (default: 10)
+ */
 
 declare(strict_types=1);
 

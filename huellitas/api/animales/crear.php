@@ -4,6 +4,17 @@
  * API Endpoint: Crear un nuevo animal
  * Método: POST
  * URL: /api/animales/crear.php
+ * 
+ * Body (JSON):
+ * {
+ *   "nombre": "Max",                (opcional)
+ *   "id_tipo_animal": 1,            (obligatorio: 1=Perro, 2=Gato, 3=Otro)
+ *   "raza": "Labrador",             (opcional)
+ *   "descripcion": "Amigable...",   (opcional)
+ *   "ubicacion": "Parque Central",  (obligatorio)
+ *   "contacto": "3001234567",       (obligatorio)
+ *   "imagen_url": "https://..."     (opcional)
+ * }
  */
 
 declare(strict_types=1);

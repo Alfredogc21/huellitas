@@ -199,7 +199,7 @@ fun PantallaListaAnimales(
                                 tint = Color(0xFFFFD700)
                             )
                             Text(
-                                text = "Admin",
+                                text = "Ingresar",
                                 style = MaterialTheme.typography.labelSmall,
                                 fontWeight = FontWeight.SemiBold,
                                 color = Color.White

@@ -1,6 +1,7 @@
 package com.example.huellitas.network
 
 import com.example.huellitas.network.dto.ActualizarEstadoRequest
+import com.example.huellitas.network.dto.EstadisticasAdminDto
 import com.example.huellitas.network.dto.RehabilitadosAdminDto
 import com.example.huellitas.network.dto.AnimalDto
 import com.example.huellitas.network.dto.ApiResponse
@@ -110,4 +111,8 @@ interface ApiService {
     // Trae dos listas: rehabilitados (estado=5) y para_adoptar (estado=6)
     @GET("api/animales/listar_rehabilitados_admin.php")
     suspend fun listarRehabilitadosAdmin(): Response<ApiResponse<RehabilitadosAdminDto>>
+
+    // Estadísticas globales del panel admin
+    @GET("api/animales/estadisticas.php")
+    suspend fun obtenerEstadisticas(): Response<ApiResponse<EstadisticasAdminDto>>
 }

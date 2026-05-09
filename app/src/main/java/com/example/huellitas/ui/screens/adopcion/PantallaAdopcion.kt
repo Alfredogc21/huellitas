@@ -22,6 +22,8 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Pets
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -46,12 +48,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import android.content.Intent
+import android.net.Uri
 import coil.compose.AsyncImage
 import com.example.huellitas.model.Animal
 import com.example.huellitas.ui.theme.GradientEnd
@@ -318,6 +323,27 @@ private fun TarjetaAdopcion(animal: Animal) {
                         color = PurpleDark.copy(alpha = 0.7f),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
+                    )
+                }
+
+                // Botón WhatsApp
+                val contexto = LocalContext.current
+                Button(
+                    onClick = {
+                        val url = "https://wa.me/573203717031?text=Hola%2C%20me%20interesa%20adoptar%20a%20${Uri.encode(if (animal.nombre.isBlank()) "este perrito" else animal.nombre)}"
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                        contexto.startActivity(intent)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF25D366)),
+                    shape = RoundedCornerShape(10.dp)
+                ) {
+                    Text(
+                        text = "💬 Contactar por WhatsApp",
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color.White
                     )
                 }
             }

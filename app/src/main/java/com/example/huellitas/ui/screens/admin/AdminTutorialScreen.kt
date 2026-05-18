@@ -64,75 +64,35 @@ private data class PasoAdmin(
 /** Los 6 pasos del tutorial de administración */
 private val pasosAdmin = listOf(
     PasoAdmin(
-        icono = Icons.Outlined.Email,
+        icono = Icons.Outlined.Email, // Usamos iconos existentes importados
         colorFondo = Color(0xFFE8DEF8),
-        titulo = "1. Bandeja de Entrada",
-        descripcion = "Aquí verás todos los reportes de animales. Puedes filtrarlos por estado: Nuevos, En Progreso o Resueltos.",
+        titulo = "1. Panel Administrativo",
+        descripcion = "Aquí verás un resumen general del sistema. Podrás revisar el estado actual de los animales a través de estadísticas.",
         puntos = listOf(
-            "\uD83D\uDCC4 Los reportes aparecen ordenados por fecha",
-            "\u2699\uFE0F Usa los filtros para organizar mejor",
-            "\uD83D\uDD34 Los casos urgentes tienen un punto rojo",
-            "\uD83D\uDCCA Las estadísticas te muestran el resumen"
+            "📊 Revisa métricas como el Total de casos y Adopciones",
+            "🗂️ Filtra los animales en tratamiento, para adoptar o adoptados",
+            "🐾 Controla fácilmente el flujo de pacientes"
         )
     ),
     PasoAdmin(
-        icono = Icons.Outlined.RemoveRedEye,
+        icono = Icons.Outlined.Settings, // Usamos iconos importados en el archivo original
         colorFondo = Color(0xFFD6E4FF),
-        titulo = "2. Ver Detalles",
-        descripcion = "Haz clic en cualquier reporte para ver toda la información: foto, ubicación, descripción y datos de contacto.",
+        titulo = "2. Gestión de Veterinarios",
+        descripcion = "Administra las clínicas y veterinarios aliados encargados de brindar atención y rehabilitar a los animales.",
         puntos = listOf(
-            "\uD83D\uDCCB Cada reporte tiene información completa",
-            "\uD83D\uDDBC\uFE0F Puedes ver las fotos en grande",
-            "\uD83D\uDCCD La ubicación exacta donde fue visto",
-            "\uD83D\uDCF1 Los datos de quien reportó"
+            "➕ Registra a nuevos veterinarios en el sistema",
+            "📋 Muestra la lista de veterinarios activos",
+            "🏥 Delega procesos a los veterinarios para posteriormente mostrar los rehabilitados"
         )
     ),
     PasoAdmin(
-        icono = Icons.Outlined.Forum,
+        icono = Icons.Outlined.Check, // Usamos iconos importados
         colorFondo = Color(0xFFD5F5E3),
-        titulo = "3. Contactar por WhatsApp",
-        descripcion = "Desde cada reporte puedes contactar a quien lo registró. También puedes generar un PDF para compartir.",
+        titulo = "3. Gestión de Adopciones",
+        descripcion = "Controla el ciclo de los pacientes ya rehabilitados, preparándolos para buscar hogar hasta confirmar su adopción.",
         puntos = listOf(
-            "\uD83D\uDCAC Botón de WhatsApp directo",
-            "\uD83D\uDCC4 Genera PDF con la información",
-            "\u2705 El mensaje incluye datos del caso",
-            "\uD83D\uDE80 Responde rápido a emergencias"
-        )
-    ),
-    PasoAdmin(
-        icono = Icons.Outlined.Sync,
-        colorFondo = Color(0xFFFFF9C4),
-        titulo = "4. Gestionar Estado",
-        descripcion = "Actualiza el estado del reporte según el progreso: Nuevo, En Progreso o Resuelto. Marca casos urgentes.",
-        puntos = listOf(
-            "\uD83C\uDD95 Nuevo: recién reportado",
-            "\u23F3 En Progreso: ya estás trabajando",
-            "\u2705 Resuelto: caso cerrado exitosamente",
-            "\u26A0\uFE0F Marca urgentes para priorizar"
-        )
-    ),
-    PasoAdmin(
-        icono = Icons.AutoMirrored.Outlined.Send,
-        colorFondo = Color(0xFFD6E4FF),
-        titulo = "5. Derivar a Instituciones",
-        descripcion = "Envía casos a veterinarias, refugios o autoridades directamente por WhatsApp con toda la información.",
-        puntos = listOf(
-            "\uD83C\uDFE5 Envía a veterinarias cercanas",
-            "\uD83E\uDDD1\u200D\uD83E\uDD1D\u200D\uD83E\uDDD1 Deriva a refugios o rescatistas",
-            "\uD83D\uDC6E Contacta autoridades si es necesario",
-            "\uD83D\uDCC4 El mensaje incluye todos los datos"
-        )
-    ),
-    PasoAdmin(
-        icono = Icons.Outlined.Settings,
-        colorFondo = Color(0xFFFFE0E0),
-        titulo = "6. Configurar Contactos",
-        descripcion = "Gestiona la lista de instituciones aliadas: veterinarias, refugios y autoridades con sus WhatsApp.",
-        puntos = listOf(
-            "\u2795 Agrega nuevas instituciones",
-            "\u270F\uFE0F Edita información de contactos",
-            "\uD83D\uDDD1\uFE0F Elimina instituciones inactivas",
-            "\uD83D\uDCDE Mantén actualizados los números"
+            "✅ Aprueba a los animales rehabilitados para su adopción pública",
+            "🏡 Cierra los casos marcándolos como adoptados exitosamente"
         )
     )
 )
